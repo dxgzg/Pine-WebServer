@@ -46,13 +46,19 @@ void TcpClient::registerClient(){
 }
 
 void TcpClient::CloseCallback(){
+    LOG_INFO("%d close callback",clientFd_->getFd());
+    auto headDet = loop_->getHeadDetection();
+    auto nodePtr = headDet->getNodePtr(clientFd_->getFd());
+    headDet->destroyConnect(nodePtr);
     channel_->setIndex(DELETE);// 准备删除操作。
     channel_->disableAll();
     auto ptr = shared_from_this();
     closeCallback_(ptr);
 }
+// 线程安全的
 void TcpClient::ReadCallback(){
     assert(isSameThread(loop_->getThreadId()));
+    LOG_INFO("%d recv msg",clientFd_->getFd());
     if(readCallback_){// 如果有就调用用户自定义的回调，没有的话，用这个; 
         int n = inputBuffer_->recvMsg(clientFd_->getFd());
         if(n <= 0){
@@ -64,7 +70,7 @@ void TcpClient::ReadCallback(){
             return ;
         }
         auto headDet = loop_->getHeadDetection();
-        headDet->adjust(clientFd_->getFd());
+        headDet->add(clientFd_->getFd(),shared_from_this(),std::bind(&TcpClient::CloseCallback,this));
         readCallback_(shared_from_this(),inputBuffer_.get());
         return ;
     }
@@ -85,13 +91,17 @@ void TcpClient::ReadCallback(){
     }
 }
 
+// 线程安全的
 int TcpClient::sendInLoop(std::string& msg){
+    assert(isSameThread(loop_->getThreadId()));
     if(getState() == (int)STATE::DISCONNECT)return 0;
     size_t n = outputBuffer_->send(clientFd_->getFd(),msg);
     if(n == UINT64_MAX){
         state_ = STATE::DISCONNECT;
         CloseCallback();
     }
+    auto headDet = loop_->getHeadDetection();
+    headDet->add(clientFd_->getFd(),shared_from_this(),std::bind(&TcpClient::CloseCallback,this));
     if(msg.size() > n){
         // 这里有bug，应该进行一个写入缓冲区操作
         cout << __FUNCTION__ <<"的n"<< n << endl;
@@ -117,6 +127,8 @@ void TcpClient::sendExtra(){
     // channel可写事件的回调函数。
     string msg = outputBuffer_->getAllString();
     size_t n = outputBuffer_->send(clientFd_->getFd(),msg);
+    auto headDet = loop_->getHeadDetection();
+    headDet->add(clientFd_->getFd(),shared_from_this(),std::bind(&TcpClient::CloseCallback,this));
     cout << "dump before n length:" << n << endl; 
     if(n == UINT64_MAX){
         state_ = STATE::DISCONNECT;

@@ -40,9 +40,7 @@ private:
     EventLoop* loop_;
     std::unique_ptr<InetAddr> inetAddr_;
     std::unique_ptr<Acceptor> acceptor_;
-
    
-    
     std::unique_ptr<EventLoopThreadPool> threadPool_;
     std::unique_ptr<Channel> channel_;
     clientMap clientMap_;

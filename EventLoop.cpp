@@ -32,9 +32,6 @@ EventLoop::EventLoop():epoller_(std::make_unique<Epoller>()),
                         wakeChanel_(std::make_unique<Channel>(this,wakefd_)),
                         headDet_(std::make_unique<HeadDetection>(this))
 {
-    // unsigned int t = *(unsigned int*)&threadId_;
-    //LOG_INFO("loop成员变量线程id: %u",t);
-
     wakeChanel_->setReadCallback(std::bind(&EventLoop::handleRead,this));
     wakeChanel_->enableReadEvent();
 }

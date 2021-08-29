@@ -18,6 +18,7 @@ public:
     ~HttpRequest() = default;
 
     bool analyseFile(const std::string&,HttpContent&);
+    // 最开始执行的函数
     void request(TcpClient*,std::string&);
 
     // 把请求文件的路径加上

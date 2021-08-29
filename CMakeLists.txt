@@ -21,6 +21,7 @@ aux_source_directory(rapidjson SRC_LIST3)
 add_executable(Pine ${SRC_LIST1} ${SRC_LIST2} ${SRC_LIST3})
 # 加一个动态链接库
 target_link_libraries(Pine pthread gflags)
+# sylar的cmake解决FILE不是相对路径的问题
 redefine_file_macro(Pine)
 
 

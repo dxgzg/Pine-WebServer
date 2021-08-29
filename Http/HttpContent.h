@@ -12,6 +12,7 @@ struct HttpContent
     std::string filePath_;// 具体文件的绝对路径
     std::string fileType_;// 请求文件的类型
     std::string header_;  // http头response
+    std::string name_; // 文件名字
     size_t fileSize_;
     int fileFd_;
     struct stat fileStat_;

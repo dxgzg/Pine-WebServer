@@ -27,15 +27,31 @@ void HttpResponse::SendFile(TcpClient* client,bool isRequestOk,HttpContent& cont
     len += client->send(content.header_);
     LOG_INFO("len header%zu\n",len);
     cout << "发送的头文件是：" << content.header_ << endl;
+    LOG_INFO("文件名字是:%s",content.name_.c_str());
     // 发完了头，在发请求文件的信息。如果是404这里是没有的
     if (isRequestOk == true)
     {
-        len = 0;
-
-        char* buff = (char*)malloc(BUFFSIZE);
-        ::read(content.fileFd_,buff,BUFFSIZE);
-        client->send(buff);
-        free(buff);
+        if(content.fileType_ == "zip"){
+            LOG_INFO("enter type: zip");
+            len = 0;
+	        while (len < content.fileSize_)
+            {
+	            // 发送的文件个数已经写入在len当中了 
+                int res = ::sendfile(client->getFd(),content.fileFd_,(off_t*)&len,content.fileStat_.st_size- len);
+                cout << "len sendfile" <<"len:" << len << "fileSize" << content.fileSize_ <<endl;
+                if(res == -1)
+                {
+                    LOG_ERROR("send error");
+	        	    break;
+                }
+            }
+	    }
+        else{
+            char* buff = (char*)malloc(BUFFSIZE);
+            ::read(content.fileFd_,buff,BUFFSIZE);
+            client->send(buff);
+            free(buff);
+        }
     }
 
 }

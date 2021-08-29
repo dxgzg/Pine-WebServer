@@ -90,6 +90,7 @@ bool HttpRequest::analyseFile(const string& request,HttpContent& content)
         LOG_INFO("未找到客户要的文件%s",content.filePath_.c_str());
         return false;
     }
+    content.name_ = requestFile;
     ::fstat(content.fileFd_,&content.fileStat_);
     // 解析文件类型
     flag = analyseFileType(requestFile,content);

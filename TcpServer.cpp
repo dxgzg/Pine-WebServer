@@ -45,7 +45,7 @@ void TcpServer::accept(){
     
     auto headDet = loop->getHeadDetection();
     std::function<void()> callback = std::bind(&TcpClient::CloseCallback,t.get());
-    loop->runInLoop(std::bind(&HeadDetection::add,headDet,t->getFd(),callback));
+    loop->runInLoop(std::bind(&HeadDetection::add,headDet,t->getFd(),t,callback));
 
 }
 
@@ -55,7 +55,7 @@ void TcpServer::handleNewClient(){
 
 // 主线程去删除这些数据
 void TcpServer::closeInLoop(Pine::clientPtr& t){
-    LOG_INFO("closeInLoop delete thread id:%lu",std::this_thread::get_id());
+    LOG_INFO("closeInLoop delete thread id:%zu",std::this_thread::get_id());
     
     int closeFd = t->getFd();
     clientMap_.erase(closeFd);
@@ -65,7 +65,7 @@ void TcpServer::closeInLoop(Pine::clientPtr& t){
 
 // 子线程处理完给主线程处理。
 void TcpServer::handleClose(Pine::clientPtr& t){
-    LOG_INFO("handleClose delete thread id:%lu",std::this_thread::get_id());
+    LOG_INFO("handleClose delete thread id:%zu",std::this_thread::get_id());
     // cout << __func__ <<"delete thread id:"<< std::this_thread::get_id() << endl;
     cout << "handleClose use count " << t.use_count() << endl;
     loop_->runInLoop(std::bind(&TcpServer::closeInLoop,this,t));

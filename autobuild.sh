@@ -9,7 +9,7 @@ fi
 if [ -d `pwd`/build ];then
     rm -rf `pwd`/build
 fi
-# жиаТБрвы
+
 mkdir `pwd`/build
 
 cd build
