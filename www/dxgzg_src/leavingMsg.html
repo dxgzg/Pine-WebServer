@@ -21,6 +21,7 @@
     <!-- <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.9/vue.common.dev.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="./js/vue-resource.js"></script>
+	<script src="https://unpkg.com/axios@0.21.3/dist/axios.min.js"></script>
 
     <link rel="stylesheet" href="css/common.css" />
     <link rel="icon" href="img/ico.png" />
@@ -97,14 +98,21 @@
                 },
                 getData: function() {
                     //发送get请求
-                    this.$http.get('msg.json', {}).then(function(resp) {
+                    /*this.$http.get('msg.json', {}).then(function(resp) {
                         //alert(resp);
                         let res = resp.data.LeavingMsg
                         this.myData = res
                         console.log(res)
                     }, function() {
                         alert('请求失败处理');
-                    });
+                    });*/
+					let that = this;
+					axios.get('msg.json').then(function(response){
+						console.log(response);
+						that.myData = response.data.LeavingMsg;
+					},function(err){
+					
+					});
                 }
             }
 
