@@ -56,8 +56,8 @@
                 <th class="text-center">序号</th>
                 <th class="text-center">内容</th>
             </tr>
-            <tr class="text-center" v-for="item in myData" :key="item.id" id="important">
-                <td>{{item.id}}</td>
+            <tr class="text-center" v-for="(item,index) in myData" :key="item.id">
+                <td>{{index}}</td>
                 <td>{{item.content}}</td>
             </tr>
         </table>
@@ -69,7 +69,7 @@
             el: '#mybox',
             data() {
                 return {
-                    myData: {},
+                    myData: [],
                     newMsg: ''
                 }
             },

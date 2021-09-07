@@ -33,7 +33,18 @@
 				margin-top: -10px;
 				list-style: none;
 			}
+			.ul2{
+				float: right;
+				margin-top: -50px;
+				list-style: none;
+			}
 			.ur li{
+				float: left;
+				margin-left: 35px;
+				color: white;
+				font-weight: 600;
+			}
+			.ul2 li{
 				float: left;
 				margin-left: 35px;
 				color: white;
