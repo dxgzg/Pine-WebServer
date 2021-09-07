@@ -31,7 +31,7 @@ void HttpResponse::SendFile(TcpClient* client,bool isRequestOk,HttpContent& cont
     // 发完了头，在发请求文件的信息。如果是404这里是没有的
     if (isRequestOk == true)
     {
-        if(content.fileType_ == "zip"){
+        if(content.fileType_ == "zip" || content.fileType_ == "json"){
             LOG_INFO("enter type: zip");
             len = 0;
 	        while (len < content.fileSize_)
