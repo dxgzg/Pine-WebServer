@@ -29,6 +29,9 @@ public:
     void sendExtra();
 
     void setTcpServerCloseCallback(const closeFun& cb){ closeCallback_ = cb;}
+    void setHeartConnectCloseCallback(const std::function<void(int)>& cb){
+        heartConnectCloseCallback_ = cb;
+    }
     void setReadCallback(Pine::TcpClientReadCallBackFun& cb){readCallback_ = cb;}
     int getFd()const{return clientFd_->getFd();}
     EventLoop* getLoop(){return loop_;}
@@ -45,4 +48,5 @@ private:
     std::unique_ptr<Buffer> inputBuffer_;
     std::unique_ptr<Buffer> outputBuffer_;
     STATE state_;
+    std::function<void(int)> heartConnectCloseCallback_;
 };

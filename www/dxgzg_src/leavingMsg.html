@@ -68,11 +68,9 @@
     <script>
         let v = new Vue({
             el: '#mybox',
-            data() {
-                return {
-                    myData: [],
-                    newMsg: ''
-                }
+            data: {
+                myData:[],
+                newMsg: '',
             },
             mounted: function() {
                 this.getData()

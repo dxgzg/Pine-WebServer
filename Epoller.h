@@ -4,11 +4,7 @@
 #include <vector>
 #include <memory>
 
-
 #include "Poller.h"
-
-
-
 class Channel;
 enum class State{
     ADD = -1,

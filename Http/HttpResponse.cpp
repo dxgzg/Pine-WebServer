@@ -1,59 +1,56 @@
 #include "HttpResponse.h"
-#include "HttpContent.h"
 #include "writer.h"
 #include "stringbuffer.h"
 #include "filewritestream.h"
 #include "filereadstream.h"
 #include "prettywriter.h"
+#include "HttpParse.h"
 #include <sys/sendfile.h>
 #include <gflags/gflags.h>
-#include <iostream>
 using namespace std;
 
 using namespace rapidjson;
 
-DEFINE_int32(id,0,"leaving message start id");
+std::map<std::string,std::string> httpContentTypes = {
+    {"js","application/x-javascript"},
+    {"css","text/"},
+    {"png","image/"},
+    {"jpg","image/"},
+    {"tar","application/"},
+    {"zip","application/"},
+    {"html","text/"},
+    {"json","application/"}
+};
+
 // 500KB
 static constexpr int BUFFSIZE = 1024 * 500;
 
+void HttpResponse::initHttpResponseHead(bool flag){
+    responseHead_->initHttpResponseHead(flag);
+}
+HttpResponse::HttpResponse():responseHead_(make_unique<ResponseHead>()){}
 
-HttpResponse::HttpResponse():id_(FLAGS_id){}
 
-void HttpResponse::SendFile(TcpClient* client,bool isRequestOk,HttpContent& content)
+void HttpResponse::SendFile(TcpClient* client,bool isRequestOk,unique_ptr<RequestFileInfo>& reqFileInfo)
 {
-    // int clientFd = client->getFd();
-    size_t len = 0;
-    // 头部一定是有的。
-    len += client->send(content.header_);
+    // 发送http头
+    size_t len = client->send(responseHead_->responseHeader_);
     LOG_INFO("len header%zu\n",len);
-    cout << "发送的头文件是：" << content.header_ << endl;
-    LOG_INFO("文件名字是:%s",content.name_.c_str());
+    LOG_INFO("文件名字是:%s",reqFileInfo->fileName_.c_str());
+
     // 发完了头，在发请求文件的信息。如果是404这里是没有的
     if (isRequestOk == true)
     {
-        if(content.fileType_ == "zip" || content.fileType_ == "json"){
-            LOG_INFO("enter type: zip");
-            len = 0;
-	        while (len < content.fileSize_)
-            {
-	            // 发送的文件个数已经写入在len当中了 
-                int res = ::sendfile(client->getFd(),content.fileFd_,(off_t*)&len,content.fileStat_.st_size- len);
-                cout << "len sendfile" <<"len:" << len << "fileSize" << content.fileSize_ <<endl;
-                if(res == -1)
-                {
-                    LOG_ERROR("send error");
-	        	    break;
-                }
-            }
-	    }
-        else{
-            char* buff = (char*)malloc(BUFFSIZE);
-            ::read(content.fileFd_,buff,BUFFSIZE);
-            client->send(buff);
-            free(buff);
-        }
-    }
+        char* buff = (char*)malloc(reqFileInfo->fileSize_);
+        ::read(reqFileInfo->fileFd_,buff,reqFileInfo->fileSize_);
+        string s(buff,reqFileInfo->fileSize_); // 性能会损失，但是不需要判断二进制了
+        client->send(s);
+        free(buff);    
+    } 
 
+    // 发送完文件关闭套接字
+    close(reqFileInfo->fileFd_);
+    client->CloseCallback();
 }
 
 bool HttpResponse::initFile(Document& dom){
@@ -91,15 +88,15 @@ bool HttpResponse::addNewMsg(std::string& msg){
     LOG_INFO("新增一条留言:%s",content.c_str());
     Document::AllocatorType&  allocator = dom.GetAllocator();
     Value item(Type::kObjectType);
-    item.AddMember("id",id_++,allocator);
+    // item.AddMember("id",id_++,allocator);
     Value s;
     s.SetString(StringRef(content.c_str()));
     item.AddMember("content", s, allocator);
     if(dom.HasMember("LeavingMsg")){
-        cout << "have LeavingMsg" << endl;
+        // cout << "have LeavingMsg" << endl;
     }
     else{
-        cout << "do not have LeavingMsg" << endl;
+        // cout << "do not have LeavingMsg" << endl;
         return false;
     }
 
@@ -107,3 +104,40 @@ bool HttpResponse::addNewMsg(std::string& msg){
     writeNewMsgToFile(dom);
     return true;
 }
+
+void HttpResponse::addHttpResponseHead(const string& head){
+    responseHead_->responseHeader_ += head;
+}
+
+void HttpResponse::processHead(unique_ptr<HttpParse>& httpParse)
+{
+    string ContentType = "Content-Type:";
+    string fileType = httpParse->getFileInfo()->fileType_; 
+    if(fileType == "js"){
+        ContentType += httpContentTypes["js"];
+    }
+    else{
+        ContentType += (httpContentTypes[fileType] + fileType);
+    }
+    addHeader(ContentType);
+
+    httpParse->getFileInfo()->fileSize_= httpParse->getFileInfo()->fileStat_.st_size;
+    string ContentLength = "Content-Length:" + to_string(httpParse->getFileInfo()->fileSize_);
+    addHeader(ContentLength);
+
+    // 最后加了一个结尾
+    addHeader("");
+}
+
+
+void HttpResponse::addHeader(const string& head)
+{   
+    string s = "\r\n";
+    if (!head.empty())
+    {   
+        s = head + "\r\n";
+    }
+    this->addHttpResponseHead(s);
+}
+
+HttpResponse::~HttpResponse(){}

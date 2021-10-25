@@ -19,8 +19,8 @@
 				clear: both;
 			}
 			.head{
-				height: 380px;
-				background-color: #395692;
+				height: 300px;
+				background-color: rgb(18, 172, 233);
 				width: 100%;
 			}
 			.t1{
@@ -74,7 +74,7 @@
 				letter-spacing: 10px;
 				width: 450px;
 				height: 80px;
-				text-align: center;
+				text-align: justify;
 			}
 			.t3{
 				width: 340px;

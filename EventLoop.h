@@ -5,11 +5,11 @@
 #include <thread>
 #include <mutex>
 
-
 #include "Epoller.h"
 
 class Channel;
-class HeadDetection;
+class HeartConnect;
+class HttpInfo;
 
 class EventLoop{
     using Function = std::function<void()>;
@@ -28,7 +28,8 @@ public:
     
     std::thread::id getThreadId()const{return threadId_;}
 
-    HeadDetection* getHeadDetection(){return headDet_.get();}
+    HeartConnect* getHeartConnect(){return heartConnect_.get();}
+    std::unique_ptr<HttpInfo>& getHttpInfo(){return httpInfo_;}
 
     // void addHeadDetection(int fd,std::function<void()> callback);
     ~EventLoop();
@@ -39,5 +40,9 @@ private:
     std::thread::id threadId_;
     mutable std::mutex mutex_;
     std::unique_ptr<Channel> wakeChanel_;
-    std::unique_ptr<HeadDetection> headDet_;
+    
+    // 与muduo不同的成员
+    std::unique_ptr<HeartConnect> heartConnect_;
+    std::unique_ptr<HttpInfo> httpInfo_;
+
 };

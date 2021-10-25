@@ -7,18 +7,15 @@
 #include "TcpClientCallback.h"
 #include "TcpServer.h"
 #include "EventLoop.h"
-#include "HttpRequest.h"
+
 class TcpClient;
 class Buffer;
-struct HttpContent;
-class HttpRequest;
+
 class HttpServer{
-        // 文件的根目录
-        EventLoop loop_;
-        TcpServer tcpServer_;
-        HttpRequest httpRequest_; // 会coredump
+    EventLoop loop_;// 主loop
+    TcpServer tcpServer_;
 public:
-        HttpServer():loop_(),tcpServer_(&loop_),httpRequest_(){}
+        HttpServer():loop_(),tcpServer_(&loop_){}
         // 用户自定义的回调函数要正确的处理异常和自己负责关闭套接字
         void ReadCallback(Pine::clientPtr t,Buffer* inputBuffer);
         void run();

@@ -1,14 +1,14 @@
 #pragma once
 #include <cstdio>
 #include <string>
-#include <mutex>
-#include <atomic>
+#include <memory>
 // 第三方库—JSON
 #include "document.h"
 
 class TcpClient;
-struct HttpContent;
-
+class ResponseHead;
+struct RequestFileInfo;
+struct HttpParse;
 
 
 // 同时也负责数据的写入
@@ -19,18 +19,22 @@ private:
     // 将新来的留言写入
     void writeNewMsgToFile(rapidjson::Document& dom);
 
-
 public:
     HttpResponse();
-    ~HttpResponse() = default;
+    ~HttpResponse();
 
-    void SendFile(TcpClient* t,bool isRequestOk,HttpContent& content);
+    void SendFile(TcpClient* t,bool isRequestOk,std::unique_ptr<RequestFileInfo>&);
     bool initFile(rapidjson::Document& d);
     
     bool addNewMsg(std::string&);
 
+    void initHttpResponseHead(bool flag);
+    void addHttpResponseHead(const std::string& head);
+    // 把一些头文件的信息都加进来，只有成功的时候调用这个函数,
+    // 并返回文件中的数据
+    void processHead(std::unique_ptr<HttpParse>& content);
+    void addHeader(const std::string& head);
 private:
-    std::atomic<int> id_; // 回头这个要改
-    // std::mutex 
+    std::unique_ptr<ResponseHead> responseHead_;
 };
 

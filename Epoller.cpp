@@ -22,6 +22,10 @@ void Epoller::poll(std::vector<Channel*>& artiveEvent){
     // 找出活跃的事件
     for(size_t i=0;i < num ;++i){
         Channel* ptr = (Channel*)artiveEvent_[i].data.ptr;
+        if(ptr == nullptr){
+            LOG_INFO("该客户已断开");
+            return ;
+        }
         // 把触发的事件也添加进去
         ptr->setCurEventState(artiveEvent_[i].events);
         artiveEvent.emplace_back(ptr);

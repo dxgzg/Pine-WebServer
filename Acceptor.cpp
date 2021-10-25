@@ -5,7 +5,6 @@
 
 #include <unistd.h>
 
-
 static int createSocket(){
     int fd = ::socket(AF_INET,SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_STREAM,0);
     return fd;

@@ -1,0 +1,517 @@
+[INFO] 2021/10/22 10:09:00 <main.cpp>main:91 main  thread id:140566102091584 start server:http
+ip:127.0.0.1
+port: 9996
+1
+[INFO] 2021/10/22 10:09:00 <EventLoopThreadPool.cpp>setThreadNum:9 set thread num:8
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>run:36 conf threadNum:8
+[INFO] 2021/10/22 10:09:00 <EventLoopThreadPool.cpp>start:17 thread size8
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>start:76 服务器启动成功,ip: 127.0.0.1:9996
+Socket58
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>accept:36 收到新的连接
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>accept:38 accept  thread id:140566083557120
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>add:47 add new headContent:58
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>ReadCallback:61 58 recv msg
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:58
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>ReadCallback:17 newHttp/HttpServer.cpp:17<ReadCallback>
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>ReadCallback:19 GET / HTTP/1.1
+Host: 127.0.0.1:9996
+User-Agent: curl/7.61.1
+Accept: */*
+
+
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpParse.cpp>setMethod:108 请求的方式为:GET
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpParse.cpp>setResponseFile:123 filePath: ./www/dxgzg_src/run.html
+flag状态是1
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:58
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpResponse.cpp>SendFile:30 len header100
+
+发送的头文件是：HTTP/1.1 200 OK
+Connection:keep-alive
+Server:Pine
+Content-Type:text/html
+Content-Length:2658
+
+
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpResponse.cpp>SendFile:32 文件名字是:run.html
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:58
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>CloseCallback:49 58 close callback
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>destroyConnect:112 destroyConnect
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>handleClose:68 handleClose delete thread id:140566083557120
+handleClose use count 3
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>closeInLoop:58 closeInLoop delete thread id:140566102091584
+closeInLoop use count 1
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>closeInLoop:63 delete client
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>~TcpClient:39 客户端退出连接
+[INFO] 2021/10/22 10:09:00 <main.cpp>main:91 main  thread id:140013680494400 start server:http
+ip:127.0.0.1
+port: 9996
+1
+[INFO] 2021/10/22 10:09:00 <EventLoopThreadPool.cpp>setThreadNum:9 set thread num:8
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>run:36 conf threadNum:8
+[INFO] 2021/10/22 10:09:00 <EventLoopThreadPool.cpp>start:17 thread size8
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>start:76 服务器启动成功,ip: 127.0.0.1:9996
+Socket58
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>accept:36 收到新的连接
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>accept:38 accept  thread id:140013653567232
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>add:47 add new headContent:58
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>ReadCallback:61 58 recv msg
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:58
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>ReadCallback:17 newHttp/HttpServer.cpp:17<ReadCallback>
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>ReadCallback:19 GET / HTTP/1.1
+Host: 127.0.0.1:9996
+User-Agent: curl/7.61.1
+Accept: */*
+
+
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpParse.cpp>setMethod:108 请求的方式为:GET
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpParse.cpp>setResponseFile:123 filePath: ./www/dxgzg_src/run.html
+flag状态是1
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:58
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpResponse.cpp>SendFile:30 len header100
+
+发送的头文件是：HTTP/1.1 200 OK
+Connection:keep-alive
+Server:Pine
+Content-Type:text/html
+Content-Length:2658
+
+
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpResponse.cpp>SendFile:32 文件名字是:run.html
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:58
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>CloseCallback:49 58 close callback
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>destroyConnect:112 destroyConnect
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>handleClose:68 handleClose delete thread id:140013653567232
+handleClose use count 3
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>closeInLoop:58 closeInLoop delete thread id:140013680494400
+closeInLoop use count 1
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>closeInLoop:63 delete client
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>~TcpClient:39 客户端退出连接
+[INFO] 2021/10/22 10:09:00 <main.cpp>main:91 main  thread id:140500656187200 start server:http
+ip:127.0.0.1
+port: 9996
+1
+[INFO] 2021/10/22 10:09:00 <EventLoopThreadPool.cpp>setThreadNum:9 set thread num:8
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>run:36 conf threadNum:8
+[INFO] 2021/10/22 10:09:00 <EventLoopThreadPool.cpp>start:17 thread size8
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>start:76 服务器启动成功,ip: 127.0.0.1:9996
+Socket52
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>accept:36 收到新的连接
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>accept:38 accept  thread id:140500612474624
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>add:47 add new headContent:52
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>ReadCallback:61 52 recv msg
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:52
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>ReadCallback:17 newHttp/HttpServer.cpp:17<ReadCallback>
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>ReadCallback:19 GET / HTTP/1.1
+Host: 127.0.0.1:9996
+User-Agent: curl/7.61.1
+Accept: */*
+
+
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpParse.cpp>setMethod:108 请求的方式为:GET
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpParse.cpp>setResponseFile:123 filePath: ./www/dxgzg_src/run.html
+flag状态是1
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:52
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpResponse.cpp>SendFile:30 len header100
+
+发送的头文件是：HTTP/1.1 200 OK
+Connection:keep-alive
+Server:Pine
+Content-Type:text/html
+Content-Length:2658
+
+
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpResponse.cpp>SendFile:32 文件名字是:run.html
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:52
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>CloseCallback:49 52 close callback
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>destroyConnect:112 destroyConnect
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>handleClose:68 handleClose delete thread id:140500612474624
+handleClose use count 3
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>closeInLoop:58 closeInLoop delete thread id:140500656187200
+closeInLoop use count 1
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>closeInLoop:63 delete client
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>~TcpClient:39 客户端退出连接
+[INFO] 2021/10/22 10:09:00 <main.cpp>main:91 main  thread id:139651499104064 start server:http
+ip:127.0.0.1
+port: 9996
+1
+[INFO] 2021/10/22 10:09:00 <EventLoopThreadPool.cpp>setThreadNum:9 set thread num:8
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>run:36 conf threadNum:8
+[INFO] 2021/10/22 10:09:00 <EventLoopThreadPool.cpp>start:17 thread size8
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>start:76 服务器启动成功,ip: 127.0.0.1:9996
+Socket40
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>accept:36 收到新的连接
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>accept:38 accept  thread id:139651480569600
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>add:47 add new headContent:40
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>ReadCallback:61 40 recv msg
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:40
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>ReadCallback:17 newHttp/HttpServer.cpp:17<ReadCallback>
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>ReadCallback:19 GET / HTTP/1.1
+Host: 127.0.0.1:9996
+User-Agent: curl/7.61.1
+Accept: */*
+
+
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpParse.cpp>setMethod:108 请求的方式为:GET
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpParse.cpp>setResponseFile:123 filePath: ./www/dxgzg_src/run.html
+flag状态是1
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:40
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpResponse.cpp>SendFile:30 len header100
+
+发送的头文件是：HTTP/1.1 200 OK
+Connection:keep-alive
+Server:Pine
+Content-Type:text/html
+Content-Length:2658
+
+
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpResponse.cpp>SendFile:32 文件名字是:run.html
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:40
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>CloseCallback:49 40 close callback
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>destroyConnect:112 destroyConnect
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>handleClose:68 handleClose delete thread id:139651480569600
+handleClose use count 3
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>closeInLoop:58 closeInLoop delete thread id:139651499104064
+closeInLoop use count 1
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>closeInLoop:63 delete client
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>~TcpClient:39 客户端退出连接
+[INFO] 2021/10/22 10:09:00 <main.cpp>main:91 main  thread id:140562215528256 start server:http
+ip:127.0.0.1
+port: 9996
+1
+[INFO] 2021/10/22 10:09:00 <EventLoopThreadPool.cpp>setThreadNum:9 set thread num:8
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>run:36 conf threadNum:8
+[INFO] 2021/10/22 10:09:00 <EventLoopThreadPool.cpp>start:17 thread size8
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>start:76 服务器启动成功,ip: 127.0.0.1:9996
+Socket58
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>accept:36 收到新的连接
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>accept:38 accept  thread id:140562171815680
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>add:47 add new headContent:58
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>ReadCallback:61 58 recv msg
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:58
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>ReadCallback:17 newHttp/HttpServer.cpp:17<ReadCallback>
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>ReadCallback:19 GET / HTTP/1.1
+Host: 127.0.0.1:9996
+User-Agent: curl/7.61.1
+Accept: */*
+
+
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpParse.cpp>setMethod:108 请求的方式为:GET
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpParse.cpp>setResponseFile:123 filePath: ./www/dxgzg_src/run.html
+flag状态是1
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:58
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpResponse.cpp>SendFile:30 len header100
+
+发送的头文件是：HTTP/1.1 200 OK
+Connection:keep-alive
+Server:Pine
+Content-Type:text/html
+Content-Length:2658
+
+
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpResponse.cpp>SendFile:32 文件名字是:run.html
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:58
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>CloseCallback:49 58 close callback
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>destroyConnect:112 destroyConnect
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>handleClose:68 handleClose delete thread id:140562171815680
+handleClose use count 3
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>closeInLoop:58 closeInLoop delete thread id:140562215528256
+closeInLoop use count 1
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>closeInLoop:63 delete client
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>~TcpClient:39 客户端退出连接
+[INFO] 2021/10/22 10:09:00 <main.cpp>main:91 main  thread id:140273871226688 start server:http
+ip:127.0.0.1
+port: 9996
+1
+[INFO] 2021/10/22 10:09:00 <EventLoopThreadPool.cpp>setThreadNum:9 set thread num:8
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>run:36 conf threadNum:8
+[INFO] 2021/10/22 10:09:00 <EventLoopThreadPool.cpp>start:17 thread size8
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>start:76 服务器启动成功,ip: 127.0.0.1:9996
+Socket40
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>accept:36 收到新的连接
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>accept:38 accept  thread id:140273819121408
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>add:47 add new headContent:40
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>ReadCallback:61 40 recv msg
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:40
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>ReadCallback:17 newHttp/HttpServer.cpp:17<ReadCallback>
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>ReadCallback:19 GET / HTTP/1.1
+Host: 127.0.0.1:9996
+User-Agent: curl/7.61.1
+Accept: */*
+
+
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpParse.cpp>setMethod:108 请求的方式为:GET
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpParse.cpp>setResponseFile:123 filePath: ./www/dxgzg_src/run.html
+flag状态是1
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:40
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpResponse.cpp>SendFile:30 len header100
+
+发送的头文件是：HTTP/1.1 200 OK
+Connection:keep-alive
+Server:Pine
+Content-Type:text/html
+Content-Length:2658
+
+
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpResponse.cpp>SendFile:32 文件名字是:run.html
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:40
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>CloseCallback:49 40 close callback
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>destroyConnect:112 destroyConnect
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>handleClose:68 handleClose delete thread id:140273819121408
+handleClose use count 3
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>closeInLoop:58 closeInLoop delete thread id:140273871226688
+closeInLoop use count 1
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>closeInLoop:63 delete client
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>~TcpClient:39 客户端退出连接
+[INFO] 2021/10/22 10:09:00 <main.cpp>main:91 main  thread id:139773062260544 start server:http
+ip:127.0.0.1
+port: 9996
+1
+[INFO] 2021/10/22 10:09:00 <EventLoopThreadPool.cpp>setThreadNum:9 set thread num:8
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>run:36 conf threadNum:8
+[INFO] 2021/10/22 10:09:00 <EventLoopThreadPool.cpp>start:17 thread size8
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>start:76 服务器启动成功,ip: 127.0.0.1:9996
+Socket58
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>accept:36 收到新的连接
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>accept:38 accept  thread id:139773035333376
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>add:47 add new headContent:58
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>ReadCallback:61 58 recv msg
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:58
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>ReadCallback:17 newHttp/HttpServer.cpp:17<ReadCallback>
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>ReadCallback:19 GET / HTTP/1.1
+Host: 127.0.0.1:9996
+User-Agent: curl/7.61.1
+Accept: */*
+
+
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpParse.cpp>setMethod:108 请求的方式为:GET
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpParse.cpp>setResponseFile:123 filePath: ./www/dxgzg_src/run.html
+flag状态是1
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:58
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpResponse.cpp>SendFile:30 len header100
+
+发送的头文件是：HTTP/1.1 200 OK
+Connection:keep-alive
+Server:Pine
+Content-Type:text/html
+Content-Length:2658
+
+
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpResponse.cpp>SendFile:32 文件名字是:run.html
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:58
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>CloseCallback:49 58 close callback
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>destroyConnect:112 destroyConnect
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>handleClose:68 handleClose delete thread id:139773035333376
+handleClose use count 3
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>closeInLoop:58 closeInLoop delete thread id:139773062260544
+closeInLoop use count 1
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>closeInLoop:63 delete client
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>~TcpClient:39 客户端退出连接
+[INFO] 2021/10/22 10:09:00 <main.cpp>main:91 main  thread id:139659864299328 start server:http
+ip:127.0.0.1
+port: 9996
+1
+[INFO] 2021/10/22 10:09:00 <EventLoopThreadPool.cpp>setThreadNum:9 set thread num:8
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>run:36 conf threadNum:8
+[INFO] 2021/10/22 10:09:00 <EventLoopThreadPool.cpp>start:17 thread size8
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>start:76 服务器启动成功,ip: 127.0.0.1:9996
+Socket58
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>accept:36 收到新的连接
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>accept:38 accept  thread id:139659837372160
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>add:47 add new headContent:58
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>ReadCallback:61 58 recv msg
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:58
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>ReadCallback:17 newHttp/HttpServer.cpp:17<ReadCallback>
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>ReadCallback:19 GET / HTTP/1.1
+Host: 127.0.0.1:9996
+User-Agent: curl/7.61.1
+Accept: */*
+
+
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpParse.cpp>setMethod:108 请求的方式为:GET
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpParse.cpp>setResponseFile:123 filePath: ./www/dxgzg_src/run.html
+flag状态是1
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:58
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpResponse.cpp>SendFile:30 len header100
+
+发送的头文件是：HTTP/1.1 200 OK
+Connection:keep-alive
+Server:Pine
+Content-Type:text/html
+Content-Length:2658
+
+
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpResponse.cpp>SendFile:32 文件名字是:run.html
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:58
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>CloseCallback:49 58 close callback
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>destroyConnect:112 destroyConnect
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>handleClose:68 handleClose delete thread id:139659837372160
+handleClose use count 3
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>closeInLoop:58 closeInLoop delete thread id:139659864299328
+closeInLoop use count 1
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>closeInLoop:63 delete client
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>~TcpClient:39 客户端退出连接
+[INFO] 2021/10/22 10:09:00 <main.cpp>main:91 main  thread id:139764945528640 start server:http
+ip:127.0.0.1
+port: 9996
+1
+[INFO] 2021/10/22 10:09:00 <EventLoopThreadPool.cpp>setThreadNum:9 set thread num:8
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>run:36 conf threadNum:8
+[INFO] 2021/10/22 10:09:00 <EventLoopThreadPool.cpp>start:17 thread size8
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>start:76 服务器启动成功,ip: 127.0.0.1:9996
+Socket58
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>accept:36 收到新的连接
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>accept:38 accept  thread id:139764918601472
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>add:47 add new headContent:58
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>ReadCallback:61 58 recv msg
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:58
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>ReadCallback:17 newHttp/HttpServer.cpp:17<ReadCallback>
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>ReadCallback:19 GET / HTTP/1.1
+Host: 127.0.0.1:9996
+User-Agent: curl/7.61.1
+Accept: */*
+
+
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpParse.cpp>setMethod:108 请求的方式为:GET
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpParse.cpp>setResponseFile:123 filePath: ./www/dxgzg_src/run.html
+flag状态是1
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:58
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpResponse.cpp>SendFile:30 len header100
+
+发送的头文件是：HTTP/1.1 200 OK
+Connection:keep-alive
+Server:Pine
+Content-Type:text/html
+Content-Length:2658
+
+
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpResponse.cpp>SendFile:32 文件名字是:run.html
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:58
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>CloseCallback:49 58 close callback
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>destroyConnect:112 destroyConnect
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>handleClose:68 handleClose delete thread id:139764918601472
+handleClose use count 3
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>closeInLoop:58 closeInLoop delete thread id:139764945528640
+closeInLoop use count 1
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>closeInLoop:63 delete client
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>~TcpClient:39 客户端退出连接
+[INFO] 2021/10/22 10:09:00 <main.cpp>main:91 main  thread id:140665968432960 start server:http
+ip:127.0.0.1
+port: 9996
+1
+[INFO] 2021/10/22 10:09:00 <EventLoopThreadPool.cpp>setThreadNum:9 set thread num:8
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>run:36 conf threadNum:8
+[INFO] 2021/10/22 10:09:00 <EventLoopThreadPool.cpp>start:17 thread size8
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>start:76 服务器启动成功,ip: 127.0.0.1:9996
+Socket52
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>accept:36 收到新的连接
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>accept:38 accept  thread id:140665949898496
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>add:47 add new headContent:52
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>ReadCallback:61 52 recv msg
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:52
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>ReadCallback:17 newHttp/HttpServer.cpp:17<ReadCallback>
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>ReadCallback:19 GET / HTTP/1.1
+Host: 127.0.0.1:9996
+User-Agent: curl/7.61.1
+Accept: */*
+
+
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpParse.cpp>setMethod:108 请求的方式为:GET
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpParse.cpp>setResponseFile:123 filePath: ./www/dxgzg_src/run.html
+flag状态是1
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:52
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpResponse.cpp>SendFile:30 len header100
+
+发送的头文件是：HTTP/1.1 200 OK
+Connection:keep-alive
+Server:Pine
+Content-Type:text/html
+Content-Length:2658
+
+
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpResponse.cpp>SendFile:32 文件名字是:run.html
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:52
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>CloseCallback:49 52 close callback
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>destroyConnect:112 destroyConnect
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>handleClose:68 handleClose delete thread id:140665949898496
+handleClose use count 3
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>closeInLoop:58 closeInLoop delete thread id:140665968432960
+closeInLoop use count 1
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>closeInLoop:63 delete client
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>~TcpClient:39 客户端退出连接
+[INFO] 2021/10/22 10:09:00 <main.cpp>main:91 main  thread id:140674224785216 start server:http
+ip:127.0.0.1
+port: 9996
+1
+[INFO] 2021/10/22 10:09:00 <EventLoopThreadPool.cpp>setThreadNum:9 set thread num:8
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>run:36 conf threadNum:8
+[INFO] 2021/10/22 10:09:00 <EventLoopThreadPool.cpp>start:17 thread size8
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>start:76 服务器启动成功,ip: 127.0.0.1:9996
+Socket58
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>accept:36 收到新的连接
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>accept:38 accept  thread id:140674206250752
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>add:47 add new headContent:58
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>ReadCallback:61 58 recv msg
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:58
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>ReadCallback:17 newHttp/HttpServer.cpp:17<ReadCallback>
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpServer.cpp>ReadCallback:19 GET / HTTP/1.1
+Host: 127.0.0.1:9996
+User-Agent: curl/7.61.1
+Accept: */*
+
+
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpParse.cpp>setMethod:108 请求的方式为:GET
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpParse.cpp>setResponseFile:123 filePath: ./www/dxgzg_src/run.html
+flag状态是1
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:58
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpResponse.cpp>SendFile:30 len header100
+
+发送的头文件是：HTTP/1.1 200 OK
+Connection:keep-alive
+Server:Pine
+Content-Type:text/html
+Content-Length:2658
+
+
+[INFO] 2021/10/22 10:09:00 <newHttp/HttpResponse.cpp>SendFile:32 文件名字是:run.html
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:63 adjust:58
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>adjust:67 存在fd
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>CloseCallback:49 58 close callback
+[INFO] 2021/10/22 10:09:00 <HeadDetection.cpp>destroyConnect:112 destroyConnect
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>handleClose:68 handleClose delete thread id:140674206250752
+handleClose use count 3
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>closeInLoop:58 closeInLoop delete thread id:140674224785216
+closeInLoop use count 1
+[INFO] 2021/10/22 10:09:00 <TcpServer.cpp>closeInLoop:63 delete client
+[INFO] 2021/10/22 10:09:00 <TcpClient.cpp>~TcpClient:39 客户端退出连接

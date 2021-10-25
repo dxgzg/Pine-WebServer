@@ -3,14 +3,13 @@
 #include <unistd.h>
 #include <assert.h>
 
-
 #include "EventLoop.h"
 #include "Epoller.h"
 #include "Channel.h"
 #include "Logger.h"
-#include "HeadDetection.h"
+#include "HeartConnect.h"
+#include "HttpParse.h"
 
-#include <iostream>
 using namespace std;
 
 
@@ -30,7 +29,8 @@ EventLoop::EventLoop():epoller_(std::make_unique<Epoller>()),
                         wakefd_(createFd()),
                         threadId_(std::this_thread::get_id()),
                         wakeChanel_(std::make_unique<Channel>(this,wakefd_)),
-                        headDet_(std::make_unique<HeadDetection>(this))
+                        heartConnect_(std::make_unique<HeartConnect>(this)),
+                        httpInfo_(make_unique<HttpInfo>())
 {
     wakeChanel_->setReadCallback(std::bind(&EventLoop::handleRead,this));
     wakeChanel_->enableReadEvent();
@@ -103,7 +103,7 @@ void EventLoop::doPendingFunctor(){
 //         headDet_->add(fd,callback);
 //     }
 //     else{
-//         Function f = std::bind(&HeadDetection::add,headDet_.get(),fd,callback);
+//         Function f = std::bind(&HeartConnect::add,headDet_.get(),fd,callback);
 //         queueInLoop(std::move(f));
 //     }
 // }

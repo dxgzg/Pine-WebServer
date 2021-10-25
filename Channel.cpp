@@ -2,8 +2,6 @@
 #include "EventLoop.h"
 
 #include <sys/epoll.h>
-
-#include <iostream>
 using namespace std;
 
 Channel::Channel(EventLoop* loop,int fd):loop_(loop),fd_(fd){}

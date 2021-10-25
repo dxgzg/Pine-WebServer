@@ -33,7 +33,7 @@ public:
     int readAble()const{
         return writeIndex_ - readIndex_;
     }
-    int writAble()const{
+    int  writAble()const{
         return vchar_.size() - writeIndex_;
     }
     void addCapacity(int len);

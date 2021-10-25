@@ -1,6 +1,6 @@
 #include "Buffer.h"
+#include "Logger.h"
 #include <string.h>
-#include <iostream>
 #include <sys/uio.h>
 #include <errno.h>
 #include <unistd.h>
@@ -22,14 +22,15 @@ void Buffer::addCapacity(int len){
 int Buffer::recvMsg(int fd){
     char extrBuff[65536];
     struct iovec vec[2];
-    ssize_t writable = writAble();
+    int writable = writAble();
     vec[0].iov_base = writeStartIndex();
     vec[0].iov_len = writable;
 
     vec[1].iov_base = extrBuff;
     vec[1].iov_len = sizeof(extrBuff);
-    const int iovcnt = (writable < sizeof extrBuff) ? 2 : 1;
+    const int iovcnt = (writable < static_cast<int>(sizeof extrBuff)) ? 2 : 1;
     ssize_t n = ::readv(fd,vec,iovcnt);
+    LOG_INFO("io block conut:%d",iovcnt);
     if(n == -1)return -1;
     if(writable >= n){
         writeIndex_ += n;

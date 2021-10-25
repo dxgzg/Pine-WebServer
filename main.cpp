@@ -8,6 +8,7 @@
 #include <execinfo.h>
 #include <thread>
 #include <gflags/gflags.h>
+
 #include "EventLoop.h"
 #include "TcpServer.h"
 #include "TcpClient.h"
@@ -87,7 +88,9 @@ int main(int argc, char** argv){
     gflags::ParseCommandLineFlags(&argc, &argv, true);
     ::signal(SIGPIPE,SIG_IGN);
     ::signal(SIGSEGV, signal_handler);
-    LOG_INFO("main  thread id:%lu start server:%s",std::this_thread::get_id(),FLAGS_func.c_str());
+    std::ostringstream oss;
+    oss << std::this_thread::get_id();
+    LOG_INFO("main  thread id:%s start server:%s",oss.str().c_str(),FLAGS_func.c_str());
     if(FLAGS_func == "echo"){
         testEcho();
     } else if(FLAGS_func == "http"){

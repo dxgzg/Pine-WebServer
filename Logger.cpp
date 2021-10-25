@@ -2,7 +2,6 @@
 #include "TimeStamp.h"
 
 #include <iostream>
-
 using namespace std;
 
 void Logger::setLevel(int level){

@@ -7,8 +7,6 @@
 #include <assert.h>
 #include <gflags/gflags.h>
 
-#include <iostream>
-
 static int listenNum = 1024;
 
 
@@ -20,13 +18,10 @@ InetAddr::InetAddr(int family)
 
 }
 bool InetAddr::sockBindListen(int serverFd){
-    std::cout << "ip:" << ip_ << std::endl;
-    std::cout << "port: " << port_ << std::endl;
     // bzero( &addr_, sizeof( addr_ ) );
     addr_.sin_family = AF_INET;
     addr_.sin_port = htons(port_);
     int res = ::inet_pton(AF_INET,ip_.c_str(),&addr_.sin_addr);
-    std::cout << res << std::endl;
     // 1表示成功
     assert(res == 1);
     res = ::bind(serverFd,(sockaddr*)&addr_,sizeof(addr_));

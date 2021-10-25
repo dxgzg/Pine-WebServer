@@ -1,5 +1,7 @@
 #pragma once
 #include <string>
+#include <thread>
+#include <sstream>
 enum class Level{
         INFO,
         ERROR,
@@ -11,7 +13,9 @@ enum class Level{
         Logger& logger = Logger::instance(); \
         logger.setLevel((int)Level::INFO); \
         char buf[1024] = { 0 }; \
-        int n = snprintf(buf,1024,"<%s>%s:%d ",__FILE__,__func__,__LINE__);\
+        std::ostringstream oss;\
+        oss << std::this_thread::get_id();\
+        int n = snprintf(buf,1024,"%s [<%s>%s:%d] ",oss.str().c_str(),__FILE__,__func__,__LINE__);\
         snprintf(buf + n,1024 - n,logmsgFormat,##__VA_ARGS__); \
         logger.print(buf); \
     }while(0)

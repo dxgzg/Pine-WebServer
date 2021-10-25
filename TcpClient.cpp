@@ -2,22 +2,15 @@
 #include "EventLoop.h"
 #include "Logger.h"
 #include "Buffer.h"
-#include "HeadDetection.h"
-
+#include "HeartConnect.h"
 
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <string.h>
 #include <assert.h>
-
-static constexpr int DELETE = 2;
-
-#if 1
-#include <iostream>
-#endif
-
 using namespace std;
+static constexpr int DELETE = 2;
 
 static bool isSameThread(const std::thread::id& thread_id){
     return thread_id == std::this_thread::get_id();
@@ -41,24 +34,32 @@ TcpClient::~TcpClient(){
 
 // 线程安全注册回调函数
 void TcpClient::registerClient(){
-    
+    assert(isSameThread(loop_->getThreadId()));
+    HeartConnect* heartConnect = loop_->getHeartConnect();
+
+    std::function<void(int)> heartCallback = std::bind(&HeartConnect::clientCloseCallback,heartConnect,std::placeholders::_1);
+    setHeartConnectCloseCallback(heartCallback);
+
+    std::function<void()> callback = std::bind(&TcpClient::CloseCallback,this);
+    heartConnect->add(getFd(),shared_from_this(),callback);
+
     channel_->enableReadEvent();
 }
 
 void TcpClient::CloseCallback(){
-    LOG_INFO("%d close callback",clientFd_->getFd());
-    auto headDet = loop_->getHeadDetection();
-    auto nodePtr = headDet->getNodePtr(clientFd_->getFd());
-    headDet->destroyConnect(nodePtr);
+    LOG_INFO("fd:%d close callback",clientFd_->getFd());
+    if(heartConnectCloseCallback_){
+        heartConnectCloseCallback_(clientFd_->getFd());
+    }
     channel_->setIndex(DELETE);// 准备删除操作。
     channel_->disableAll();
     auto ptr = shared_from_this();
-    closeCallback_(ptr);
+    closeCallback_(ptr); // 这个是必定存在的
 }
 // 线程安全的
 void TcpClient::ReadCallback(){
     assert(isSameThread(loop_->getThreadId()));
-    LOG_INFO("%d recv msg",clientFd_->getFd());
+    LOG_INFO("fd:%d recv msg",clientFd_->getFd());
     if(readCallback_){// 如果有就调用用户自定义的回调，没有的话，用这个; 
         int n = inputBuffer_->recvMsg(clientFd_->getFd());
         if(n <= 0){
@@ -69,7 +70,7 @@ void TcpClient::ReadCallback(){
             CloseCallback();
             return ;
         }
-        auto headDet = loop_->getHeadDetection();
+        auto headDet = loop_->getHeartConnect();
         headDet->add(clientFd_->getFd(),shared_from_this(),std::bind(&TcpClient::CloseCallback,this));
         readCallback_(shared_from_this(),inputBuffer_.get());
         return ;
@@ -94,17 +95,20 @@ void TcpClient::ReadCallback(){
 // 线程安全的
 int TcpClient::sendInLoop(std::string& msg){
     assert(isSameThread(loop_->getThreadId()));
-    if(getState() == (int)STATE::DISCONNECT)return 0;
+    if(getState() == (int)STATE::DISCONNECT){
+        LOG_INFO("客户已经断开连接了");
+        return 0;
+    }
     size_t n = outputBuffer_->send(clientFd_->getFd(),msg);
+    LOG_INFO("send msg n:%d",n);
     if(n == UINT64_MAX){
         state_ = STATE::DISCONNECT;
+        LOG_INFO("send error");
         CloseCallback();
     }
-    auto headDet = loop_->getHeadDetection();
+    auto headDet = loop_->getHeartConnect();
     headDet->add(clientFd_->getFd(),shared_from_this(),std::bind(&TcpClient::CloseCallback,this));
     if(msg.size() > n){
-        // 这里有bug，应该进行一个写入缓冲区操作
-        cout << __FUNCTION__ <<"的n"<< n << endl;
         string s = msg.substr(n);
         outputBuffer_->addMessage(const_cast<char*>(s.c_str()),s.size());
         channel_->enableWriteEvent();
@@ -124,12 +128,12 @@ int TcpClient::send(std::string msg){
 
 void TcpClient::sendExtra(){
     if(getState() == (int)(STATE::DISCONNECT))return ;
+
     // channel可写事件的回调函数。
     string msg = outputBuffer_->getAllString();
     size_t n = outputBuffer_->send(clientFd_->getFd(),msg);
-    auto headDet = loop_->getHeadDetection();
+    auto headDet = loop_->getHeartConnect();
     headDet->add(clientFd_->getFd(),shared_from_this(),std::bind(&TcpClient::CloseCallback,this));
-    cout << "dump before n length:" << n << endl; 
     if(n == UINT64_MAX){
         state_ = STATE::DISCONNECT;
         CloseCallback();
@@ -139,15 +143,10 @@ void TcpClient::sendExtra(){
         channel_->disableWriteEvent();
     }
     else{
-        cout << __FUNCTION__ << "的n:"<<n<<"msg size:"<<msg.size()<< endl;
-        cout << "没想到吧，我还在执行" << endl;
         string s = msg.substr(n);
         outputBuffer_->addMessage(const_cast<char*>(s.c_str()),s.size());
     }
     if(n == UINT64_MAX){
         CloseCallback();
     }
-    cout << "=====================" << endl;
-    cout << "我还可以再战！！！！！！！！ " << endl;
-    cout << "=====================" << endl;
 }
