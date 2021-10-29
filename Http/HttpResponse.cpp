@@ -44,13 +44,13 @@ void HttpResponse::SendFile(TcpClient* client,bool isRequestOk,unique_ptr<Reques
         char* buff = (char*)malloc(reqFileInfo->fileSize_);
         ::read(reqFileInfo->fileFd_,buff,reqFileInfo->fileSize_);
         string s(buff,reqFileInfo->fileSize_); // 性能会损失，但是不需要判断二进制了
-        client->send(s);
+        client->send(std::move(s));
         free(buff);    
     } 
 
     // 发送完文件关闭套接字
     close(reqFileInfo->fileFd_);
-    client->CloseCallback();
+    // client->CloseCallback();
 }
 
 bool HttpResponse::initFile(Document& dom){
