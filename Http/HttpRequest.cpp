@@ -11,6 +11,8 @@ bool HttpRequest::request(TcpClient* client,std::string& msg,unique_ptr<HttpInfo
     bool flag = httpInfo->parse_->analyseFile(msg);
     httpInfo->response_->initHttpResponseHead(flag);
     if(!flag){
+        string s = "";
+        httpInfo->response_->addHeader(s); // 加一个结尾
         return false;
     }
 

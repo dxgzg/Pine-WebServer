@@ -6,7 +6,7 @@
 
 #include <sys/timerfd.h>
 #include <assert.h>
-#include <sys/epoll.h>
+#include <unistd.h>
 
 static bool isSameThread(const std::thread::id& thread_id){
     return thread_id == std::this_thread::get_id();
@@ -78,9 +78,14 @@ void HeartConnect::adjust(int fd){
 
 void HeartConnect::headRead(){
     assert(isSameThread(loop_->getThreadId()));
+    uint64_t exp;
+    ::read(timefd_, &exp, sizeof(uint64_t)); // 需要把给定时器的数据读出来
+
     struct timespec now;
     int ret = clock_gettime(CLOCK_REALTIME, &now);//获取时钟时间
     assert(ret != -1);
+    LOG_INFO("timeout");
+    
     while(!NodeList_.empty()){
         auto ptr = *NodeList_.rbegin();
         __time_t time = ptr->time_ + expire_;
@@ -99,9 +104,10 @@ void HeartConnect::del(NodePtr ptr){
     if(ptr->cPtr_.lock() != nullptr){
         LOG_INFO("timeout call closeBack");
         ptr->callback_();
+    } else{
+        destroyConnect(ptr); // callback会自动调用了，提前离开的需要自己调用
     }
-    // destroyConnect(ptr); // callback会自动调用了，不需要主动调用了
-}
+} 
 
 void HeartConnect::destroyConnect(NodePtr ptr){
     assert(isSameThread(loop_->getThreadId()));

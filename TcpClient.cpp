@@ -128,7 +128,7 @@ int TcpClient::send(std::string msg){
 
 void TcpClient::sendExtra(){
     if(getState() == (int)(STATE::DISCONNECT))return ;
-
+    LOG_INFO("send extra");
     // channel可写事件的回调函数。
     string msg = outputBuffer_->getAllString();
     size_t n = outputBuffer_->send(clientFd_->getFd(),msg);

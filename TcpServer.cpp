@@ -30,9 +30,10 @@ TcpServer::TcpServer(EventLoop* loop,
 
 void TcpServer::accept(){
     int connfd = acceptor_->accept();
-    LOG_INFO("main accept new connect");
     EventLoop* loop = threadPool_->getNextLoop();
     Pine::clientPtr t(new TcpClient(loop,connfd));
+    LOG_INFO("main accept new connect");
+    
     std::function<void(Pine::clientPtr&)>fun = std::bind(&TcpServer::handleClose,this,std::placeholders::_1);
     t->setTcpServerCloseCallback(fun);
     t->setReadCallback(readCallback_);
