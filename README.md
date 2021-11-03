@@ -9,7 +9,7 @@
 ```
 
 如果cmake make 库也没有，可以下载一个docker，来拉取我的镜像，以centos为例
-<code>
+```
     sudo yum install docker
     docker pull dxgzg/pine:1.0
     docker image ls # 查看一下是否成功拉取镜像
@@ -18,6 +18,6 @@
     vim server.conf # 更改你的配置项和设置html页面的路径
     # 可以研究一下怎么把外部文件放进容器中，这个有博客介绍过，我没研究过，等有时间这里再补充一下
     ./Pine --flagfile server.conf # 就启动了
-</code>
+```
 
 <a href="http://dxgzg.site">个人网站链接</a>
