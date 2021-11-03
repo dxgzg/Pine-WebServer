@@ -1,4 +1,4 @@
-此网络库仿照的也是muduo网络库，one loop per thread 的模型，自己封装了HTTP协议。这个web server主要是帮助了前端工程师建立一个自己的网站，如果不需要POST请求，单纯是为了让人们看到你的页面使用此web server是一个不错的选择，因为配置真的是极其简单。如果需要POST请求处理一些业务逻辑，如我自己网站的留言版，在main.cpp可以写一个postCallback，把回调函数注册到web server中，当有post请求发生时候可以自行写业务代码。
+此网络库仿照的也是muduo网络库，one loop per thread 的模型，自己封装了HTTP协议。这个web server主要是帮助了前端工程师建立一个自己的网站，如果不需要POST请求，单纯是为了让人们看到你的页面使用此web server是一个不错的选择，因为配置真的是极其简单。如果需要POST请求处理一些业务逻辑，如我自己网站的留言版，在main.cpp可以写一个postCallback，把回调函数注册到web server中，当有post请求发生时候调用注册的回调函数
 
 单机ab测试
 ```
