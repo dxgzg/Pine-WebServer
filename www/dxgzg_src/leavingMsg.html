@@ -20,7 +20,7 @@
     <!-- <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.9/vue.common.dev.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="./js/vue-resource.js"></script>
-	<script src="https://unpkg.com/axios@0.21.3/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/axios@0.21.3/dist/axios.min.js"></script>
 
     <link rel="stylesheet" href="css/common.css" />
     <link rel="icon" href="img/ico.png" />
@@ -47,7 +47,7 @@
             </div>
             <div class="form-group">
                 <input type="button" value="添加" class="btn btn-primary" @click="add()">
-                
+
             </div>
         </form>
         <hr/>
@@ -69,7 +69,7 @@
         let v = new Vue({
             el: '#mybox',
             data: {
-                myData:[],
+                myData: [],
                 newMsg: '',
             },
             mounted: function() {
@@ -81,11 +81,19 @@
                     if (this.newMsg === "") return;
                     let str = `/addMsg`
                     this.$http.post(str, {
-                        content: this.newMsg
-                    }).then(function() {
-                        this.getData()
-                        this.newMsg = ''
-                    })
+                            content: this.newMsg
+                        }).then(function() {
+                            this.getData()
+                            this.newMsg = ''
+                        })
+                        // axios.post(str, {
+                        //     content: this.newMsg
+                        // }).then(function(response) {
+                        //     this.getData()
+                        //     this.newMsg = ""
+                        // }, function(err) {
+
+                    // });
                 },
                 deleteMsg: function(index) {
                     if (index == -2) {
@@ -104,13 +112,13 @@
                     }, function() {
                         alert('请求失败处理');
                     });*/
-					let that = this;
-					axios.get('msg.json').then(function(response){
-						console.log(response);
-						that.myData = response.data.LeavingMsg;
-					},function(err){
-					
-					});
+                    let that = this;
+                    axios.get('msg.json').then(function(response) {
+                        console.log(response);
+                        that.myData = response.data.LeavingMsg;
+                    }, function(err) {
+
+                    });
                 }
             }
 

@@ -1,5 +1,6 @@
 #include <iostream>
-#include <string.h>
+#include <cstring>
+#include <string>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -9,6 +10,12 @@
 #include <thread>
 #include <gflags/gflags.h>
 
+#include "rapidjson/filewritestream.h"
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/filereadstream.h"
+
 #include "EventLoop.h"
 #include "TcpServer.h"
 #include "TcpClient.h"
@@ -16,6 +23,7 @@
 #include "Buffer.h"
 #include "Logger.h"
 using namespace std;
+using namespace rapidjson;
 constexpr int BACKTRACE_SIZE = 16;
 DEFINE_string(func,"echo", "What function to do");
 
@@ -80,8 +88,48 @@ void testEcho(){
     t.start();
     loop.loop();
 }
+
+// 处理业务逻辑代码
+void postCb(string type,string args){
+    if(type == "/addMsg"){ //  添加留言
+        Document tmp;
+        tmp.Parse(args.c_str());
+        Document d;
+        FILE* fp = fopen("./www/dxgzg_src/msg.json","r");
+        char buffer[65536];
+        FileReadStream is(fp,buffer,sizeof(buffer));
+
+        d.ParseStream(is);
+
+        Value key(kObjectType);
+        Value value;
+        const char* str = tmp["content"].GetString();
+        value.SetString(str,strlen(str));
+        cout << value.GetString() << endl;
+        key.AddMember("content",value,d.GetAllocator());
+ 
+        if(!d.HasMember("LeavingMsg")){
+            cout << "不含有leavingMsg" << endl;
+            return ;
+        }
+        
+        d["LeavingMsg"].PushBack(key,d.GetAllocator());
+        fclose(fp);
+
+        char writerbuffer[65536];
+        fp = fopen("./www/dxgzg_src/msg.json","wr");
+        FileWriteStream os(fp,writerbuffer,sizeof(writerbuffer));
+    
+        Writer<FileWriteStream> writer(os);
+        d.Accept(writer);
+
+        fclose(fp);
+    }
+
+}   
 void testHttp(){
     HttpServer http;
+    http.setPostReadCallback(std::bind(postCb,std::placeholders::_1,std::placeholders::_2));
     http.run();
 }
 int main(int argc, char** argv){

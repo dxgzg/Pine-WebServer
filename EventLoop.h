@@ -25,9 +25,8 @@ public:
 	void wakeup();
     void handleRead();
     void doPendingFunctor();
-    
-    std::thread::id getThreadId()const{return threadId_;}
 
+    std::thread::id getThreadId()const{return threadId_;}
     HeartConnect* getHeartConnect(){return heartConnect_.get();}
     std::unique_ptr<HttpInfo>& getHttpInfo(){return httpInfo_;}
 

@@ -9,11 +9,24 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <unordered_set>
 using namespace std;
 
 DEFINE_string(serverName,"Pine", "server name");
+DEFINE_string(index,"run.html", "web index html");
+DEFINE_string(path,"./www/dxgzg_src", "html path");
 
- bool RequestFileInfo::fileIsExist(){
+static unordered_set<string> filterSet{
+    "http",
+    "\\",
+    "password",
+    "/",
+    "args"
+    "bin"
+    "user"
+};
+
+bool RequestFileInfo::fileIsExist(){
     fileFd_ = ::open(filePath_.c_str(),O_CLOEXEC | O_RDONLY);
     if (fileFd_ < 0)
     {   // 说明未找到请求的文件
@@ -24,7 +37,7 @@ DEFINE_string(serverName,"Pine", "server name");
 
 void ResponseHead::initHttpResponseHead(bool flag){
     if(flag){
-        responseHeader_ = "HTTP/1.1 200 OK\r\nConnection:keep-alive\r\n";
+        responseHeader_ = "HTTP/1.1 200 OK\r\n";
     } else{
         responseHeader_ = "HTTP/1.1 404 NOTFOUND\r\nContent-Length:0\r\n";
     }
@@ -43,11 +56,19 @@ HttpInfo::HttpInfo():response_(make_unique<HttpResponse>())
 
 }
 
-HttpParse::HttpParse():reqFileInfo_(make_unique<RequestFileInfo>()),method_(){
+HttpParse::HttpParse():path_(FLAGS_path),
+                        reqFileInfo_(make_unique<RequestFileInfo>()),method_()
+{
 
 }
-
-bool HttpParse::analyseFile(const string& request)
+bool HttpParse::simpleFilter(std::string& s){
+    auto npos = std::string::npos;
+    for(auto& val : filterSet){
+        if(s.find(val) != npos)return false;
+    }
+    return true;
+}
+bool HttpParse::analyseFile(const string& request,postCallback& cb)
 {
     regex reg(pattern_);
     smatch mas;
@@ -64,32 +85,38 @@ bool HttpParse::analyseFile(const string& request)
 
     // 请求的具体文件
     string requestFile = mas[2];
-
     /*
     * POST传数据，可接受到JSON文件，GET的话会转码
     * POST暂时不去重构
     */
     if(method_ == METHOD::POST){
         // 可以解析下是不是传过来json文件了
-        // std::stringstream ss(request);
-        // string tmp , leaveMsg;
-        // while(getline(ss,tmp)){
-        //     leaveMsg = std::move(tmp);
-        // }
-        // requestFile = "/msg.json";
-        // httpResponse_.addNewMsg(leaveMsg);
+        std::stringstream ss(request);
+        string tmp , args;
+        while(getline(ss,tmp)){
+            args = std::move(tmp); // 最后一行就是post传来的参数了
+        }
+        if(!simpleFilter(args)){ // 没有通过过滤的话
+            return false;
+        }
+        cb(requestFile,args); 
+        return true;
     }
 
     // 先获取请求的文件
     setResponseFile(requestFile);
 
+    LOG_INFO("parse request file:%s",requestFile.c_str());
+
     bool flag = reqFileInfo_->fileIsExist();
+    reqFileInfo_->fileName_ = requestFile;
+
     // 如果文件不存在的话也就不需要解析类型
     if(!flag){
         LOG_INFO("未找到客户要的文件%s",reqFileInfo_->filePath_.c_str());
         return false;
     }
-    reqFileInfo_->fileName_ = requestFile;
+
     ::fstat(reqFileInfo_->fileFd_,&reqFileInfo_->fileStat_);
     // 解析文件类型
     flag = analyseFileType(requestFile);
@@ -111,9 +138,8 @@ void HttpParse::setMethod(const std::string& method){
 void HttpParse::setResponseFile(std::string& requestFile){
     if (requestFile == "/")
     { // 如果是/的话就给默认值
-        reqFileInfo_->filePath_ = path_;
-        reqFileInfo_->filePath_ += "/run.html";
-        requestFile = "run.html";
+        reqFileInfo_->filePath_ = path_+ FLAGS_index;
+        requestFile = FLAGS_index;
     }
     else
     {
@@ -121,6 +147,7 @@ void HttpParse::setResponseFile(std::string& requestFile){
         reqFileInfo_->filePath_ += requestFile; 
     }
     LOG_INFO("filePath: %s",reqFileInfo_->filePath_.c_str());
+    LOG_INFO("name: %s",requestFile.c_str());
 }
 
 bool HttpParse::analyseFileType(const std::string& requestFile){

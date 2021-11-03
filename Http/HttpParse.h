@@ -4,6 +4,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <memory>
+#include <gflags/gflags.h>
+#include <unordered_map>
 
 #include "TcpClient.h"
 #include "Logger.h"
@@ -38,32 +40,30 @@ public:
     ~ResponseHead();
 };
 
-
-
 class HttpParse{
+    using postCallback = std::function<void(std::string,std::string)>;
 private:
     // 在[]的^是以什么什么开头，放在[]里面的是非的意思
     const std::string pattern_ = "^([A-Z]+) ([A-Za-z./1-9-?=]*)";
-    const std::string path_ = "./www/dxgzg_src";
+    const std::string path_;
 private:
     std::unique_ptr<RequestFileInfo> reqFileInfo_; // 解析的文件信息
-    METHOD method_;
+    METHOD method_; 
 public:
     HttpParse();
-    bool analyseFile(const std::string&);
+    bool analyseFile(const std::string&,postCallback&);
     void setResponseFile(std::string&);
     bool analyseFileType(const std::string&);
     std::unique_ptr<RequestFileInfo>& getFileInfo(){return reqFileInfo_;}
+    METHOD getMethod(){return method_;}
     ~HttpParse();
 private:
     
     void setMethod(const std::string&);
+    bool simpleFilter(std::string&);
 };
 
 struct HttpInfo{
-    // 下面这俩由request和response对象包含
-    // RequestFileInfo reqFileInfo_;
-    // ResponseHead reshead_;
     std::unique_ptr<HttpResponse> response_;
     std::unique_ptr<HttpRequest> request_;
     std::unique_ptr<HttpParse> parse_;

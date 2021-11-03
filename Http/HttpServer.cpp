@@ -20,10 +20,10 @@ void HttpServer::ReadCallback(Pine::clientPtr client,Buffer* inputBuffer){
     unique_ptr<HttpInfo>& httpInfo = client->getLoop()->getHttpInfo();
 
     // 解析请求的内容
-    bool flag = httpInfo->request_->request(client.get(),str,httpInfo);
+    bool flag = httpInfo->request_->request(client.get(),str,httpInfo,postCallback_);
 
     // 发送请求的文件
-    httpInfo->response_->SendFile(client.get(),flag,httpInfo->parse_->getFileInfo());    
+    httpInfo->response_->SendFile(client.get(),flag,httpInfo);    
 }
 
 void HttpServer::run(){
@@ -32,4 +32,8 @@ void HttpServer::run(){
     tcpServer_.setClientReadCallback(std::bind(&HttpServer::ReadCallback,this,std::placeholders::_1,std::placeholders::_2));
     tcpServer_.start();
     loop_.loop();
+}
+
+HttpServer::~HttpServer() = default;
+HttpServer::HttpServer():loop_(),tcpServer_(&loop_),postCallback_(){
 }
