@@ -94,6 +94,14 @@ void postCb(string type,string args){
     if(type == "/addMsg"){ //  添加留言
         Document tmp;
         tmp.Parse(args.c_str());
+        if(tmp.HasParseError()){
+            LOG_ERROR("parse args error args:%s",args.c_str());
+            return ;
+        }
+        if(!tmp.HasMember("content")){
+            LOG_ERROR("不含有content");
+            return ;
+        }
         Document d;
         FILE* fp = fopen("./www/dxgzg_src/msg.json","r");
         char buffer[65536];
