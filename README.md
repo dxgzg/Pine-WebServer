@@ -2,12 +2,11 @@
 
 
 万事都齐全的情况
-
-<code>
+```
   # 外部依赖库:gflags库
   chmod +x autobuild.sh # 加一个可执行权限
   ./autobuild.sh # 就可以跑起来了
-</code>
+```
 
 如果cmake make 库也没有，可以下载一个docker，来拉取我的镜像，以centos为例
 <code>
