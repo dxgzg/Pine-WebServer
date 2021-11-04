@@ -52,14 +52,16 @@
         </form>
         <hr/>
         <table class="table table-border table-hover">
-            <caption class="h2 text-info">留言表一览</caption>
+            <caption class="h2 text-info" align="top">留言表一览</caption>
             <tr class="text-danger">
                 <th class="text-center">序号</th>
                 <th class="text-center">内容</th>
+                <th class="text-center">时间</th>
             </tr>
             <tr class="text-center" v-for="(item,index) in myData" :key="item.id">
                 <td>{{index}}</td>
                 <td>{{item.content}}</td>
+                <td>{{item.time}}</td>
             </tr>
         </table>
         <!--模态框 弹出框-->

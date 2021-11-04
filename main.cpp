@@ -22,6 +22,7 @@
 #include "HttpServer.h"
 #include "Buffer.h"
 #include "Logger.h"
+#include "TimeStamp.h"
 using namespace std;
 using namespace rapidjson;
 constexpr int BACKTRACE_SIZE = 16;
@@ -120,6 +121,10 @@ void postCb(string type,string args){
             cout << "不含有leavingMsg" << endl;
             return ;
         }
+        
+        string now = TimeStamp::Now();
+        value.SetString(now.c_str(),now.size());
+        key.AddMember("time",value,d.GetAllocator());
         
         d["LeavingMsg"].PushBack(key,d.GetAllocator());
         fclose(fp);
