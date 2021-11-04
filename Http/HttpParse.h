@@ -44,7 +44,7 @@ class HttpParse{
     using postCallback = std::function<void(std::string,std::string)>;
 private:
     // 在[]的^是以什么什么开头，放在[]里面的是非的意思
-    const std::string pattern_ = "^([A-Z]+) ([A-Za-z./1-9-?=]*)";
+    const std::string pattern_ = "^([A-Z]+) ([A-Za-z./1-9-?=+]*)";
     const std::string path_;
 private:
     std::unique_ptr<RequestFileInfo> reqFileInfo_; // 解析的文件信息
