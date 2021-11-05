@@ -40,16 +40,14 @@
         </ul>
     </div>
     <div class="container" id="mybox">
-        <form action="" role="form">
-            <div class="form-group">
-                <label for="MSGLabel">可以在这里输入留言信息哦！</label>
-                <input v-model="newMsg" type="text" id="msg" class="form-control" placeholder="例如:智智好帅">
-            </div>
-            <div class="form-group">
-                <input type="button" value="添加" class="btn btn-primary" @click="add()">
+        <div class="form-group">
+            <label for="MSGLabel">可以在这里输入留言信息哦！</label>
+            <input v-model="newMsg" type="text" class="form-control" placeholder="例如:智智好帅" @keyup.enter="add">
+        </div>
+        <div class="form-group">
+            <input type="button" value="添加" class="btn btn-primary" @click="add()">
 
-            </div>
-        </form>
+        </div>
         <hr/>
         <table class="table table-border table-hover">
             <caption class="h2 text-info" align="top">留言表一览</caption>
@@ -80,6 +78,7 @@
             },
             methods: {
                 add: function() {
+                    console.log("hello")
                     if (this.newMsg === "") return;
                     let str = `/addMsg`
                     this.$http.post(str, {
