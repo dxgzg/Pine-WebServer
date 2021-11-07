@@ -117,6 +117,7 @@
                     axios.get('msg.json').then(function(response) {
                         console.log(response);
                         that.myData = response.data.LeavingMsg;
+                        that.myData.reverse();
                     }, function(err) {
 
                     });
