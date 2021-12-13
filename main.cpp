@@ -167,7 +167,7 @@ bool postCb(string type,string args){
             return false;
         }
         string passKey = tmp["passKey"].GetString();
-        if(passKey != "20180922"){
+        if(passKey != ""){
             cout << tmp["passKey"].GetString() << endl;
             LOG_ERROR("passKey error");
             return false;
