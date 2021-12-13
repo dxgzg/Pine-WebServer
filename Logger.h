@@ -15,8 +15,8 @@ enum class Level{
         char buf[1024] = { 0 }; \
         std::ostringstream oss;\
         oss << std::this_thread::get_id();\
-        int n = snprintf(buf,1024,"%s [<%s>%s:%d] ",oss.str().c_str(),__FILE__,__func__,__LINE__);\
-        snprintf(buf + n,1024 - n,logmsgFormat,##__VA_ARGS__); \
+        int LOG_N = snprintf(buf,1024,"%s [<%s>%s:%d] ",oss.str().c_str(),__FILE__,__func__,__LINE__);\
+        snprintf(buf + LOG_N,1024 - LOG_N,logmsgFormat,##__VA_ARGS__); \
         logger.print(buf); \
     }while(0)
 

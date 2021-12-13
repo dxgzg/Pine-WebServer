@@ -3,6 +3,7 @@
 #include "Logger.h"
 #include "Buffer.h"
 #include "HeartConnect.h"
+#include "HttpParse.h"
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -21,7 +22,9 @@ TcpClient::TcpClient(EventLoop* loop,int clientFd)
             loop_(loop),
             inputBuffer_(make_unique<Buffer>()),
             outputBuffer_(make_unique<Buffer>()),
-            state_(STATE::CONNECT)
+            state_(STATE::CONNECT),
+            httpInfo_(make_unique<HttpInfo>()),
+            status_(PARSE_STATUS::PARSE_NONE)
 {
     channel_->setReadCallback(std::bind(&TcpClient::ReadCallback,this));// 这是默认的，客户端也可以再次调用
     channel_->setCloseCallback(std::bind(&TcpClient::CloseCallback,this));
@@ -149,4 +152,20 @@ void TcpClient::sendExtra(){
     if(n == UINT64_MAX){
         CloseCallback();
     }
+}
+
+std::unique_ptr<HttpInfo>& TcpClient::resetHttpInfo(){
+    // httpInfo_ = make_unique<HttpInfo>();
+    // if(status_ == PARSE_STATUS::PARSE_OK){
+        httpInfo_->reset();
+    // }
+    return httpInfo_;
+}
+
+void TcpClient::setParseStatus(PARSE_STATUS s){
+    status_ = s;
+}
+
+void TcpClient::readOk(int len){
+    inputBuffer_->retrieve(len);
 }

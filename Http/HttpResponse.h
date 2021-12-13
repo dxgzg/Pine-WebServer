@@ -31,6 +31,7 @@ public:
     // 并返回文件中的数据
     void processHead(std::unique_ptr<HttpParse>& content);
     void addHeader(const std::string& head);
+    void reset();
 private:
 private:
     std::unique_ptr<ResponseHead> responseHead_;

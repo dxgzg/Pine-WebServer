@@ -64,9 +64,11 @@ public:
 
     std::string getAllString(){
         std::string s(startReadIndex(),readAble());// 后面表示拼接字符串的长度
-        retrieve(s.size());
-        return s;// char*自动转字符串了
+        // retrieve(s.size());
+        // return std::move(s);// char*自动转字符串了
+        return s;
     }
+
     int send(int fd,std::string& msg);
 
     int recvMsg(int fd);

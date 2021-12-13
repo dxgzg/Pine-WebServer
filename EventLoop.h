@@ -9,7 +9,6 @@
 
 class Channel;
 class HeartConnect;
-class HttpInfo;
 
 class EventLoop{
     using Function = std::function<void()>;
@@ -28,7 +27,6 @@ public:
 
     std::thread::id getThreadId()const{return threadId_;}
     HeartConnect* getHeartConnect(){return heartConnect_.get();}
-    std::unique_ptr<HttpInfo>& getHttpInfo(){return httpInfo_;}
 
     // void addHeadDetection(int fd,std::function<void()> callback);
     ~EventLoop();
@@ -42,6 +40,4 @@ private:
     
     // 与muduo不同的成员
     std::unique_ptr<HeartConnect> heartConnect_;
-    std::unique_ptr<HttpInfo> httpInfo_;
-
 };

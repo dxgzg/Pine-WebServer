@@ -23,7 +23,7 @@ void Epoller::poll(std::vector<Channel*>& artiveEvent){
     for(size_t i=0;i < num ;++i){
         Channel* ptr = (Channel*)artiveEvent_[i].data.ptr;
         if(ptr == nullptr){
-            LOG_INFO("该客户已断开");
+            LOG_ERROR("该客户已断开");
             return ;
         }
         // 把触发的事件也添加进去

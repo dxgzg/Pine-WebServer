@@ -5,9 +5,11 @@
 #include "Channel.h"
 #include "TcpClientCallback.h"
 #include "Socket.h"
+#include "const.h"
 
 class Buffer;
 class EventLoop;
+class HttpInfo;
 enum class STATE{
     CONNECT = 0,
     DISCONNECT = 1
@@ -39,9 +41,15 @@ public:
 
     int sendInLoop(std::string&);
     int getState()const{return (int)state_;}
+    std::unique_ptr<HttpInfo>& getHttpInfo(){return httpInfo_;}
+    std::unique_ptr<HttpInfo>& resetHttpInfo();
+
+    void setParseStatus(PARSE_STATUS);
+    PARSE_STATUS getParseStatus(){return status_;}
+    void readOk(int len);
 private:
     std::unique_ptr<Socket> clientFd_;
-    std::unique_ptr<Channel> channel_;
+    std::unique_ptr<Channel> channel_; 
     EventLoop* loop_;
     Pine::TcpClientReadCallBackFun readCallback_;
     closeFun closeCallback_;
@@ -49,4 +57,6 @@ private:
     std::unique_ptr<Buffer> outputBuffer_;
     STATE state_;
     std::function<void(int)> heartConnectCloseCallback_;
+    std::unique_ptr<HttpInfo> httpInfo_;
+    PARSE_STATUS status_;
 };

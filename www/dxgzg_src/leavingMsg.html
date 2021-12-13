@@ -56,7 +56,7 @@
                 <th class="text-center">内容</th>
                 <th class="text-center">时间</th>
             </tr>
-            <tr class="text-center" v-for="(item,index) in myData" :key="item.id">
+            <tr class="text-center" v-for="(item,index) in myData">
                 <td>{{index}}</td>
                 <td>{{item.content}}</td>
                 <td>{{item.time}}</td>
@@ -78,23 +78,26 @@
             },
             methods: {
                 add: function() {
-                    console.log("hello")
                     if (this.newMsg === "") return;
                     let str = `/addMsg`
-                    this.$http.post(str, {
-                            content: this.newMsg
-                        }).then(function() {
-                            this.getData()
-                            this.newMsg = ''
-                        })
-                        // axios.post(str, {
-                        //     content: this.newMsg
-                        // }).then(function(response) {
-                        //     this.getData()
-                        //     this.newMsg = ""
-                        // }, function(err) {
-
-                    // });
+                        // this.$http.post(str, {
+                        //         content: this.newMsg
+                        //     }).then(function() {
+                        //         this.getData()
+                        //         this.newMsg = ''
+                        //     })
+                    var that = this;
+                    axios.post(str, {
+                        content: that.newMsg
+                    }).then(function(response) {
+                        console.log("post then")
+                        console.log(response)
+                        that.getData()
+                        that.newMsg = ""
+                        console.log("send")
+                    }, function(err) {
+                        alert("error")
+                    });
                 },
                 deleteMsg: function(index) {
                     if (index == -2) {

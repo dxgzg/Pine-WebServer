@@ -14,10 +14,9 @@ DEFINE_int32(threadNum,4, "set thread num");
 using namespace std;
 
 void HttpServer::ReadCallback(Pine::clientPtr client,Buffer* inputBuffer){
-    LOG_INFO("%s:%d<%s>",__FILE__,__LINE__,__FUNCTION__);
     string str = inputBuffer->getAllString();
     LOG_INFO("%s",str.c_str());
-    unique_ptr<HttpInfo>& httpInfo = client->getLoop()->getHttpInfo();
+    unique_ptr<HttpInfo>& httpInfo = client->resetHttpInfo();
 
     // 解析请求的内容
     bool flag = httpInfo->request_->request(client.get(),str,httpInfo,postCallback_);

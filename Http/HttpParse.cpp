@@ -28,6 +28,7 @@ static unordered_set<string> filterSet{
 
 bool RequestFileInfo::fileIsExist(){
     fileFd_ = ::open(filePath_.c_str(),O_CLOEXEC | O_RDONLY);
+    LOG_INFO("file:%s fd:%d",filePath_.c_str(),fileFd_);
     if (fileFd_ < 0)
     {   // 说明未找到请求的文件
         return false;
@@ -37,7 +38,7 @@ bool RequestFileInfo::fileIsExist(){
 
 void ResponseHead::initHttpResponseHead(bool flag){
     if(flag){
-        responseHeader_ = "HTTP/1.1 200 OK\r\n";
+        responseHeader_ = "HTTP/1.1 200 OK\r\n";//Origin:*\r\n
     } else{
         responseHeader_ = "HTTP/1.1 404 NOTFOUND\r\nContent-Length:0\r\n";
     }
@@ -68,13 +69,13 @@ bool HttpParse::simpleFilter(std::string& s){
     }
     return true;
 }
-bool HttpParse::analyseFile(const string& request,postCallback& cb)
+bool HttpParse::analyseFile(TcpClient* client,const string& request,postCallback& cb)
 {
     regex reg(pattern_);
     smatch mas;
     regex_search(request,mas,reg);
     // 因为下标0是代表匹配的整体
-    if(mas.size() < 3){
+    if(mas.size() < 3 ){
         LOG_ERROR("不是正常请求");
         // 啥都不是直接返回false
         return false;
@@ -82,7 +83,7 @@ bool HttpParse::analyseFile(const string& request,postCallback& cb)
     //请求文件类型
     string method = mas[1];
     setMethod(method);
-
+ 
     // 请求的具体文件
     string requestFile = mas[2];
     /*
@@ -90,19 +91,28 @@ bool HttpParse::analyseFile(const string& request,postCallback& cb)
     * POST暂时不去重构
     */
     if(method_ == METHOD::POST){
-        // 可以解析下是不是传过来json文件了
-        std::stringstream ss(request);
-        string tmp , args;
-        while(getline(ss,tmp)){
-            args = std::move(tmp); // 最后一行就是post传来的参数了
-        }
-        if(!simpleFilter(args)){ // 没有通过过滤的话
+
+        size_t index = request.find("\"}");
+        if(index == string::npos){ // 说明还需要继续读post过来的数据
+            client->setParseStatus(PARSE_STATUS::PARSE_CONTINUE);
             return false;
         }
-        cb(requestFile,args); 
-        return true;
-    }
+        
+        index = request.find_last_of("\r\n");
+        if(index == string::npos){
+            client->setParseStatus(PARSE_STATUS::PARSE_CONTINUE);
+            return false;
+        }
+        client->setParseStatus(PARSE_STATUS::PARSE_OK);
+        string args = request.substr(index + 1);
 
+        // if(!simpleFilter(args)){ // 没有通过过滤的话
+        //     LOG_ERROR("not pass fiter");
+        //     return false;
+        // }
+        return cb(requestFile,args); 
+    }
+    client->setParseStatus(PARSE_STATUS::PARSE_OK);
     // 先获取请求的文件
     setResponseFile(requestFile);
 
@@ -155,6 +165,27 @@ bool HttpParse::analyseFileType(const std::string& requestFile){
      if(i == string::npos)return false;
      reqFileInfo_->fileType_ = requestFile.substr(i + 1);
      return true;
+}
+
+void RequestFileInfo::reset(){
+    this->fileFd_ = -1;
+    this->fileName_ = "";
+    this->filePath_ = "";
+    this->fileSize_ = 0;
+    this->fileType_ = "";
+}
+
+void HttpParse::reset(){
+    this->reqFileInfo_->reset();
+}
+
+void HttpResponse::reset(){
+    responseHead_->responseHeader_ = "";
+}
+
+void HttpInfo::reset(){
+    this->response_->reset();
+    this->parse_->reset();
 }
 
 RequestFileInfo::~RequestFileInfo() = default;

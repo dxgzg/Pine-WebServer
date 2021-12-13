@@ -8,7 +8,6 @@
 #include "Channel.h"
 #include "Logger.h"
 #include "HeartConnect.h"
-#include "HttpParse.h"
 
 using namespace std;
 
@@ -29,8 +28,7 @@ EventLoop::EventLoop():epoller_(std::make_unique<Epoller>()),
                         wakefd_(createFd()),
                         threadId_(std::this_thread::get_id()),
                         wakeChanel_(std::make_unique<Channel>(this,wakefd_)),
-                        heartConnect_(std::make_unique<HeartConnect>(this)),
-                        httpInfo_(make_unique<HttpInfo>())
+                        heartConnect_(std::make_unique<HeartConnect>(this))
 {
     wakeChanel_->setReadCallback(std::bind(&EventLoop::handleRead,this));
     wakeChanel_->enableReadEvent();

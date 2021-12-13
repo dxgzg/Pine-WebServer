@@ -4,6 +4,11 @@
 #include <gflags/gflags.h>
 using namespace std;
 
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 using namespace rapidjson;
 
 std::map<std::string,std::string> httpContentTypes = {
@@ -27,14 +32,20 @@ HttpResponse::HttpResponse():responseHead_(make_unique<ResponseHead>()){}
 
 
 void HttpResponse::SendFile(TcpClient* client,bool isRequestOk,std::unique_ptr<HttpInfo>& httpInfo)
-{
+{   
+    if(client->getParseStatus() != PARSE_STATUS::PARSE_OK){
+        return ;
+    }
+
     unique_ptr<RequestFileInfo>& reqFileInfo = httpInfo->parse_->getFileInfo();
     // 发送http头
     size_t len = client->send(responseHead_->responseHeader_);
+    LOG_INFO("head:%s",responseHead_->responseHeader_.c_str());
 
     // 发完了头，在发请求文件的信息。如果是404这里是没有的
-    if (isRequestOk == true)
-    {
+    if (isRequestOk == true && reqFileInfo->fileFd_ != -1)
+    {   
+        LOG_INFO("ENTRY filefd:%d",reqFileInfo->fileFd_);
         char* buff = (char*)malloc(reqFileInfo->fileSize_);
         ::read(reqFileInfo->fileFd_,buff,reqFileInfo->fileSize_);
         string s(buff,reqFileInfo->fileSize_); // 性能会损失，但是不需要判断二进制了
@@ -45,12 +56,11 @@ void HttpResponse::SendFile(TcpClient* client,bool isRequestOk,std::unique_ptr<H
 
     } else if(httpInfo->parse_->getMethod() == METHOD::POST){
         LOG_INFO("POST");
-        client->CloseCallback();
+        // client->CloseCallback();
+        client->send("{\"error\":0}");
     }
 
-    
 }
-
 
 void HttpResponse::addHttpResponseHead(const string& head){
     responseHead_->responseHeader_ += head;

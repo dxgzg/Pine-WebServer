@@ -16,15 +16,18 @@ class HttpRequest;
 
 struct RequestFileInfo
 {   
-    int fileFd_; // 文件fd
-    std::string filePath_;// 具体文件的路径
-    std::string fileType_;// 请求文件的类型    
-    std::string fileName_; // 文件名字
-    size_t fileSize_; // 文件大小
+    int fileFd_ = -1; // 文件fd
+    std::string filePath_ = "";// 具体文件的路径
+    std::string fileType_ = "";// 请求文件的类型    
+    std::string fileName_ = ""; // 文件名字
+    size_t fileSize_ = 0 ; // 文件大小
     struct stat fileStat_;
 
 public:
+    RequestFileInfo():fileFd_(-1),filePath_(""),fileType_(""),fileName_(""),
+                      fileSize_(0),fileStat_(){}
     bool fileIsExist();
+    void reset();
     ~RequestFileInfo();
 };
 
@@ -41,7 +44,7 @@ public:
 };
 
 class HttpParse{
-    using postCallback = std::function<void(std::string,std::string)>;
+    using postCallback = std::function<bool(std::string,std::string)>;
 private:
     // 在[]的^是以什么什么开头，放在[]里面的是非的意思
     const std::string pattern_ = "^([A-Z]+) ([A-Za-z./1-9-?=+]*)";
@@ -51,11 +54,12 @@ private:
     METHOD method_; 
 public:
     HttpParse();
-    bool analyseFile(const std::string&,postCallback&);
+    bool analyseFile(TcpClient* client,const std::string&,postCallback&);
     void setResponseFile(std::string&);
     bool analyseFileType(const std::string&);
     std::unique_ptr<RequestFileInfo>& getFileInfo(){return reqFileInfo_;}
     METHOD getMethod(){return method_;}
+    void reset();
     ~HttpParse();
 private:
     
@@ -69,4 +73,5 @@ struct HttpInfo{
     std::unique_ptr<HttpParse> parse_;
     HttpInfo();
     ~HttpInfo();
+    void reset();
 };

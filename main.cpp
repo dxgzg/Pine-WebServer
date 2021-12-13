@@ -9,12 +9,15 @@
 #include <execinfo.h>
 #include <thread>
 #include <gflags/gflags.h>
+#include <fstream>
 
 #include "rapidjson/filewritestream.h"
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/filereadstream.h"
+#include "random.h"
+#include "Base64.h"
 
 #include "EventLoop.h"
 #include "TcpServer.h"
@@ -23,6 +26,13 @@
 #include "Buffer.h"
 #include "Logger.h"
 #include "TimeStamp.h"
+
+#if 0
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#endif
+
 using namespace std;
 using namespace rapidjson;
 constexpr int BACKTRACE_SIZE = 16;
@@ -91,17 +101,17 @@ void testEcho(){
 }
 
 // 处理业务逻辑代码
-void postCb(string type,string args){
+bool postCb(string type,string args){
     if(type == "/addMsg"){ //  添加留言
         Document tmp;
         tmp.Parse(args.c_str());
         if(tmp.HasParseError()){
             LOG_ERROR("parse args error args:%s",args.c_str());
-            return ;
+            return false;
         }
         if(!tmp.HasMember("content")){
             LOG_ERROR("不含有content");
-            return ;
+            return false;
         }
         Document d;
         FILE* fp = fopen("./www/dxgzg_src/msg.json","r");
@@ -119,9 +129,9 @@ void postCb(string type,string args){
  
         if(!d.HasMember("LeavingMsg")){
             cout << "不含有leavingMsg" << endl;
-            return ;
+            return false;
         }
-        
+
         string now = TimeStamp::Now();
         value.SetString(now.c_str(),now.size());
         key.AddMember("time",value,d.GetAllocator());
@@ -137,8 +147,87 @@ void postCb(string type,string args){
         d.Accept(writer);
 
         fclose(fp);
-    }
 
+        return true;
+    } else if(type == "/addPicture"){
+        Document tmp;
+        tmp.Parse(args.c_str());
+
+        if(tmp.HasParseError()){    
+            LOG_ERROR("parse args error");
+            // LOG_ERROR("parse args error args:%s",args.c_str());
+            return true;
+        }
+        if(!tmp.HasMember("content")){
+            LOG_ERROR("不含有content");
+            return false;
+        }
+        if(!tmp.HasMember("passKey")){ // 待改
+            LOG_ERROR("不含有passKey");
+            return false;
+        }
+        string passKey = tmp["passKey"].GetString();
+        if(passKey != "20180922"){
+            cout << tmp["passKey"].GetString() << endl;
+            LOG_ERROR("passKey error");
+            return false;
+        }
+
+        string str = tmp["content"].GetString();
+        // cout << str << endl;
+        string s(str.data(),30);
+
+        int index = s.find_first_of(",");
+        s = s.substr(0,index);
+        int start = s.find_first_of("/");
+        int end = s.find_first_of(";");
+        
+        string pictureFmt = s.substr(start + 1,end - start - 1);
+        LOG_INFO("picture fmt:%s",pictureFmt.c_str());
+        string randomName = getName(16);
+        string picname = "www/dxgzg_src/img/";
+        picname += randomName;
+        picname += ".";
+        picname += pictureFmt;
+        LOG_INFO("file name:%s",picname.c_str());
+
+        string content(str.data() + index + 1);
+        string imgdecode64 = base64_decode(content);
+        
+        ofstream os(picname,ios::out | ios::binary);
+        if(!os || !os.is_open() || os.bad() || os.fail()){
+            cout << "file open error" << endl;
+            return -1;
+        }
+        os << imgdecode64;
+        os.close();
+
+       
+        FILE* fp = fopen("./www/dxgzg_src/pictureList.json","rw");
+        char buffer[65536];
+        FileReadStream is(fp,buffer,sizeof(buffer));
+        string listName = "img/";
+        listName += randomName ;
+        listName += ".";
+        listName += pictureFmt;
+
+        tmp.ParseStream(is);
+        Value val(listName.c_str(), tmp.GetAllocator()); 
+        tmp["pictureList"].PushBack(val,tmp.GetAllocator());
+        fclose(fp);
+
+        char writerbuffer[65536];
+        fp = fopen("./www/dxgzg_src/pictureList.json","wr");
+        FileWriteStream os2(fp,writerbuffer,sizeof(writerbuffer));
+    
+        Writer<FileWriteStream> writer(os2);
+        tmp.Accept(writer);
+
+        fclose(fp);
+
+        return true;
+    }
+    return false;
 }   
 void testHttp(){
     HttpServer http;

@@ -16,7 +16,7 @@ class HttpInfo;
 
 class HttpServer{
 private:
-    using callback = std::function<void(std::string,std::string)>;
+    using callback = std::function<bool(std::string,std::string)>;
 private:
     EventLoop loop_;// 主loop
     TcpServer tcpServer_;

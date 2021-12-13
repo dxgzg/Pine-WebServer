@@ -1,0 +1,113 @@
+<!--
+ * @Author: your name
+ * @Date: 2021-04-22 21:01:32
+ * @LastEditTime: 2021-06-24 19:38:11
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \undefinedd:\练习\上传图片.html
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .file {
+            position: relative;
+            width: 200px;
+            height: 150px;
+            background-color: #ccc;
+        }
+        
+        .updata {
+            display: block;
+            height: 100%;
+            width: 100%;
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+        }
+        
+        .img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200px;
+            height: 150px;
+        }
+    </style>
+    <link rel="stylesheet" href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css'>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios@0.21.3/dist/axios.min.js"></script>
+</head>
+
+<body>
+    <div id="file">
+        <input type="file" accept="image/*" @change="change($event)" ref="updata">
+        <!-- <img :src="imageUrl ? imageUrl : baseImg" alt="" class="img"> -->
+        请输入上传密码:
+        <input type="text" v-model="passKey">
+        <!-- <button @click="change">提交</button> -->
+    </div>
+    <script>
+        new Vue({
+            el: "#file",
+            data: {
+                // 上传的图片
+                imageUrl: '',
+                // 默认的图片
+                baseImg: 'img/ico.png',
+                passKey: 0,
+            },
+            methods: {
+                change(e) {
+                    console.log(e.target.files[0].name);
+                    // 判断是不是规定格式
+                    // let name  =  e.target.files[0].name
+
+                    // 获取到第一张图片
+                    let file = e.target.files[0]
+
+                    // 创建文件读取对象
+                    var reader = new FileReader()
+                    var that = this
+
+                    //  将文件读取为DataURL
+                    reader.readAsDataURL(file)
+                        // reader.readAsBinaryString(file)
+                    console.log("准备读取")
+                        // 读取成功调用方法
+                    reader.onload = e => {
+                        console.log('读取成功');
+
+                        // e.target.result 获取 读取成功后的  文件DataURL
+                        that.imageUrl = e.target.result
+
+
+                        console.log(that.imageUrl);
+                        let str = "addPicture"
+                        axios.post(str, {
+                            content: that.imageUrl,
+                            passKey: that.passKey
+                                // content: "hello"
+                        }).then(function(response) {
+                            that.newMsg = ""
+                            console.log("send")
+                        }, function(err) {
+                            alert("error")
+                            console.log(err);
+                        });
+                    }
+
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

@@ -34,11 +34,12 @@ bool Socket::setReuseAddr(bool on){
 int Socket::accept(){
     // 把连接的套接字也设置成非阻塞的
     int connfd = ::accept4(sockfd_,nullptr,nullptr,SOCK_NONBLOCK | SOCK_CLOEXEC);
+    // int connfd = ::accept4(sockfd_,nullptr,nullptr,SOCK_CLOEXEC);
     if(connfd < 0){
         LOG_ERROR("accept error: %d",errno);
         return -1;
     }
-    cout<<"Socket"<<connfd<<endl;
+
     return connfd;
  }
 

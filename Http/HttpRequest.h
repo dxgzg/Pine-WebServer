@@ -9,7 +9,7 @@ class HttpInfo;
 
 class HttpRequest : public nocopyable
 {   
-    using postCallback = std::function<void(std::string,std::string)>;
+    using postCallback = std::function<bool(std::string,std::string)>;
 public:
     HttpRequest() = default;
     ~HttpRequest();
