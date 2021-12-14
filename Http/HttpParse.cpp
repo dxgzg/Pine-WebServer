@@ -136,17 +136,19 @@ bool HttpParse::analyseFile(TcpClient* client,const string& request,postCallback
         // 如果文件不存在的话也就不需要解析类型
         if(!flag){
             LOG_INFO("未找到客户要的文件%s",reqFileInfo_->filePath_.c_str());
-            return flag;
+            
+        } else{
+            ::fstat(reqFileInfo_->fileFd_,&reqFileInfo_->fileStat_);
+            // 解析文件类型
+            flag = analyseFileType(requestFile);    
         }
-
-        ::fstat(reqFileInfo_->fileFd_,&reqFileInfo_->fileStat_);
-        // 解析文件类型
-        flag = analyseFileType(requestFile);    
     }
 
     if(client->getParseStatus() == PARSE_STATUS::PARSE_OK){// 解析完成要移动数据了
+       
         LOG_INFO("entry");
         client->readOk(request.size());
+
         if(flag){
             client->setHttpStatusCode(HTTP_STATUS_CODE::OK);
         } else{
