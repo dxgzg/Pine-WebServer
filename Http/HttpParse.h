@@ -38,7 +38,7 @@ struct ResponseHead{
     // 后期还可以加个时间格式     
 
 public:
-    void initHttpResponseHead(bool flag);
+    void initHttpResponseHead(HTTP_STATUS_CODE code);
     void addResponseHead(const std::string& s = "\r\n");   
     ~ResponseHead();
 };

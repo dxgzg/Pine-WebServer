@@ -5,19 +5,14 @@
 #include "HttpResponse.h"
 
 using namespace std;
+bool HttpRequest::analyseFile(TcpClient* client,std::string& msg,unique_ptr<HttpInfo>& httpInfo,postCallback& cb){
+    return httpInfo->parse_->analyseFile(client,msg,cb);
+}
+// 只有解析完成才能进入的
+bool HttpRequest::request(TcpClient* client,unique_ptr<HttpInfo>& httpInfo){
+    httpInfo->response_->initHttpResponseHead(client->getHttpStatusCode());
 
-bool HttpRequest::request(TcpClient* client,std::string& msg,unique_ptr<HttpInfo>& httpInfo,postCallback& cb){
-
-    bool flag = httpInfo->parse_->analyseFile(client,msg,cb);
-    if(client->getParseStatus() == PARSE_STATUS::PARSE_OK){
-        LOG_INFO("entry");
-        client->readOk(msg.size());
-    } else{
-        return false;
-    }
-    httpInfo->response_->initHttpResponseHead(flag);
-
-    if(!flag){ // 为POST方法和404状态码加一个协议结尾
+    if(client->getHttpStatusCode() == HTTP_STATUS_CODE::NOT_FOUND){ // 为POST方法和404状态码加一个协议结尾
         // post和404不支持长链接
         string connect = "Connection: close";
         httpInfo->response_->addHeader(connect);
@@ -25,10 +20,7 @@ bool HttpRequest::request(TcpClient* client,std::string& msg,unique_ptr<HttpInfo
         string s = "";
         httpInfo->response_->addHeader(s); // 加一个结尾
         return false;
-    } 
-    if(httpInfo->parse_->getMethod() == METHOD::POST && flag){
-        // string message = "response:{\"error\":0}";
-        // httpInfo->response_->addHeader(message);
+    } else if(httpInfo->parse_->getMethod() == METHOD::POST){
 
         string connect = "Connection:keep-alive";
         httpInfo->response_->addHeader(connect);
@@ -40,11 +32,12 @@ bool HttpRequest::request(TcpClient* client,std::string& msg,unique_ptr<HttpInfo
 
         httpInfo->response_->addHeader(""); // 加一个结尾
         return true;
+    } else if(httpInfo->parse_->getMethod() == METHOD::GET){
+        // 这个修改头文件的，先调用这个,长链接也是在这里加
+        httpInfo->response_->processHead(httpInfo->parse_);
     }
-    // 这个修改头文件的，先调用这个,长链接也是在这里加
-    httpInfo->response_->processHead(httpInfo->parse_);
-    
-    return true;
+
+    return true;    
 }
 
 

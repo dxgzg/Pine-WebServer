@@ -25,8 +25,8 @@ std::map<std::string,std::string> httpContentTypes = {
 // 500KB
 static constexpr int BUFFSIZE = 1024 * 500;
 
-void HttpResponse::initHttpResponseHead(bool flag){
-    responseHead_->initHttpResponseHead(flag);
+void HttpResponse::initHttpResponseHead(HTTP_STATUS_CODE code){
+    responseHead_->initHttpResponseHead(code);
 }
 HttpResponse::HttpResponse():responseHead_(make_unique<ResponseHead>()){}
 
@@ -43,7 +43,7 @@ void HttpResponse::SendFile(TcpClient* client,bool isRequestOk,std::unique_ptr<H
     LOG_INFO("head:%s",responseHead_->responseHeader_.c_str());
 
     // 发完了头，在发请求文件的信息。如果是404这里是没有的
-    if (isRequestOk == true && reqFileInfo->fileFd_ != -1)
+    if (client->getHttpStatusCode() != HTTP_STATUS_CODE::NOT_FOUND && reqFileInfo->fileFd_ != -1)
     {   
         LOG_INFO("ENTRY filefd:%d",reqFileInfo->fileFd_);
         char* buff = (char*)malloc(reqFileInfo->fileSize_);

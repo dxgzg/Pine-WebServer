@@ -7,6 +7,8 @@
 
 using namespace std;
 
+static int BUFFER_LEVEL = 1024 * 1024;
+
 void Buffer::addCapacity(int len){
     // true 就可以开启挤牙膏模式
     if(readIndex_ + writAble() - head > len){
@@ -16,7 +18,12 @@ void Buffer::addCapacity(int len){
         writeIndex_ = readAbleLength;    
     }
     else{
-        vchar_.resize(vchar_.size() + len);// 开启扩容
+        
+        if(vchar_.size() < BUFFER_LEVEL){
+            vchar_.resize(vchar_.size() + len * 2);
+        } else{
+           vchar_.resize(vchar_.size() + len + BUFFER_LEVEL);// 开启扩容 
+        }
     }
 }
 

@@ -18,8 +18,14 @@ void HttpServer::ReadCallback(Pine::clientPtr client,Buffer* inputBuffer){
     LOG_INFO("%s",str.c_str());
     unique_ptr<HttpInfo>& httpInfo = client->resetHttpInfo();
 
-    // 解析请求的内容
-    bool flag = httpInfo->request_->request(client.get(),str,httpInfo,postCallback_);
+    httpInfo->request_->analyseFile(client.get(),str,httpInfo,postCallback_);
+
+    if(client->getParseStatus() == PARSE_STATUS::PARSE_CONTINUE){
+        return ;
+    }
+
+    // 解析请求的内容 
+    bool flag = httpInfo->request_->request(client.get(),httpInfo);
 
     // 发送请求的文件
     httpInfo->response_->SendFile(client.get(),flag,httpInfo);    

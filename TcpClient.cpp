@@ -24,7 +24,8 @@ TcpClient::TcpClient(EventLoop* loop,int clientFd)
             outputBuffer_(make_unique<Buffer>()),
             state_(STATE::CONNECT),
             httpInfo_(make_unique<HttpInfo>()),
-            status_(PARSE_STATUS::PARSE_NONE)
+            status_(PARSE_STATUS::PARSE_NONE),
+            code_(HTTP_STATUS_CODE::NONE)
 {
     channel_->setReadCallback(std::bind(&TcpClient::ReadCallback,this));// 这是默认的，客户端也可以再次调用
     channel_->setCloseCallback(std::bind(&TcpClient::CloseCallback,this));

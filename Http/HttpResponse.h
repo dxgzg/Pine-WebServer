@@ -5,6 +5,7 @@
 #include <functional>
 // 第三方库—JSON
 #include "document.h"
+#include "const.h"
 
 class TcpClient;
 class ResponseHead;
@@ -25,7 +26,7 @@ public:
 
     void SendFile(TcpClient* t,bool isRequestOk,std::unique_ptr<HttpInfo>&);
 
-    void initHttpResponseHead(bool flag);
+    void initHttpResponseHead(HTTP_STATUS_CODE);
     void addHttpResponseHead(const std::string& head);
     // 把一些头文件的信息都加进来，只有成功的时候调用这个函数,
     // 并返回文件中的数据

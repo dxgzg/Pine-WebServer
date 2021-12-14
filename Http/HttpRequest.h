@@ -15,7 +15,9 @@ public:
     ~HttpRequest();
  
     // 最开始执行的函数
-    bool request(TcpClient*,std::string&,std::unique_ptr<HttpInfo>&,postCallback&);    
+    bool request(TcpClient*,std::unique_ptr<HttpInfo>&);    
+
+    bool analyseFile(TcpClient* client,std::string& msg,std::unique_ptr<HttpInfo>& httpInfo,postCallback&);
 private:
 };
 

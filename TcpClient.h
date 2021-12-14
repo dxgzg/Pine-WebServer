@@ -45,7 +45,11 @@ public:
     std::unique_ptr<HttpInfo>& resetHttpInfo();
 
     void setParseStatus(PARSE_STATUS);
-    PARSE_STATUS getParseStatus(){return status_;}
+    PARSE_STATUS getParseStatus()noexcept{return status_;}
+
+    void setHttpStatusCode(HTTP_STATUS_CODE code){code_ = code;}
+    HTTP_STATUS_CODE getHttpStatusCode()noexcept{return code_;}
+
     void readOk(int len);
 private:
     std::unique_ptr<Socket> clientFd_;
@@ -59,4 +63,5 @@ private:
     std::function<void(int)> heartConnectCloseCallback_;
     std::unique_ptr<HttpInfo> httpInfo_;
     PARSE_STATUS status_;
+    HTTP_STATUS_CODE code_;
 };

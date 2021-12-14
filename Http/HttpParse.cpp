@@ -36,11 +36,17 @@ bool RequestFileInfo::fileIsExist(){
     return true;
  }
 
-void ResponseHead::initHttpResponseHead(bool flag){
-    if(flag){
+void ResponseHead::initHttpResponseHead(HTTP_STATUS_CODE code){
+    switch (code)
+    {
+    case HTTP_STATUS_CODE::OK:
         responseHeader_ = "HTTP/1.1 200 OK\r\n";//Origin:*\r\n
-    } else{
+        break;
+    case HTTP_STATUS_CODE::NOT_FOUND:
         responseHeader_ = "HTTP/1.1 404 NOTFOUND\r\nContent-Length:0\r\n";
+        break;
+    default: 
+        break;
     }
     responseHeader_ += "Server:" + FLAGS_serverName + "\r\n";
 }
@@ -74,9 +80,13 @@ bool HttpParse::analyseFile(TcpClient* client,const string& request,postCallback
     regex reg(pattern_);
     smatch mas;
     regex_search(request,mas,reg);
+
+
     // 因为下标0是代表匹配的整体
     if(mas.size() < 3 ){
         LOG_ERROR("不是正常请求");
+        client->setParseStatus(PARSE_STATUS::PARSE_OK);
+        client->setHttpStatusCode(HTTP_STATUS_CODE::NOT_FOUND);
         // 啥都不是直接返回false
         return false;
     }
@@ -86,52 +96,66 @@ bool HttpParse::analyseFile(TcpClient* client,const string& request,postCallback
  
     // 请求的具体文件
     string requestFile = mas[2];
+    bool flag = true;
     /*
     * POST传数据，可接受到JSON文件，GET的话会转码
     * POST暂时不去重构
     */
     if(method_ == METHOD::POST){
-
-        size_t index = request.find("\"}");
-        if(index == string::npos){ // 说明还需要继续读post过来的数据
-            client->setParseStatus(PARSE_STATUS::PARSE_CONTINUE);
+        client->setParseStatus(PARSE_STATUS::PARSE_CONTINUE);
+        
+        
+        size_t start = request.find_last_of("\r\n");
+        if(start == string::npos){
             return false;
         }
-        
-        index = request.find_last_of("\r\n");
-        if(index == string::npos){
-            client->setParseStatus(PARSE_STATUS::PARSE_CONTINUE);
+
+        size_t index = request.find("\"}");
+        if(index == string::npos){ // 说明还需要继续读post过来的数据     
             return false;
         }
         client->setParseStatus(PARSE_STATUS::PARSE_OK);
-        string args = request.substr(index + 1);
+        string args = request.substr(start + 1);
 
         // if(!simpleFilter(args)){ // 没有通过过滤的话
         //     LOG_ERROR("not pass fiter");
         //     return false;
         // }
-        return cb(requestFile,args); 
+        flag = cb(requestFile,args);
+    } else{
+        client->setHttpStatusCode(HTTP_STATUS_CODE::NOT_FOUND);
+        client->setParseStatus(PARSE_STATUS::PARSE_OK);// 直接默认GET请求是读完的了
+        // 先获取请求的文件
+        setResponseFile(requestFile);
+
+        LOG_INFO("parse request file:%s",requestFile.c_str());
+
+        flag = reqFileInfo_->fileIsExist();
+        reqFileInfo_->fileName_ = requestFile;
+
+        // 如果文件不存在的话也就不需要解析类型
+        if(!flag){
+            LOG_INFO("未找到客户要的文件%s",reqFileInfo_->filePath_.c_str());
+            return flag;
+        }
+
+        ::fstat(reqFileInfo_->fileFd_,&reqFileInfo_->fileStat_);
+        // 解析文件类型
+        flag = analyseFileType(requestFile);    
     }
-    client->setParseStatus(PARSE_STATUS::PARSE_OK);
-    // 先获取请求的文件
-    setResponseFile(requestFile);
 
-    LOG_INFO("parse request file:%s",requestFile.c_str());
-
-    bool flag = reqFileInfo_->fileIsExist();
-    reqFileInfo_->fileName_ = requestFile;
-
-    // 如果文件不存在的话也就不需要解析类型
-    if(!flag){
-        client->setParseStatus(PARSE_STATUS::PARSE_OK);
-        LOG_INFO("未找到客户要的文件%s",reqFileInfo_->filePath_.c_str());
+    if(client->getParseStatus() == PARSE_STATUS::PARSE_OK){// 解析完成要移动数据了
+        LOG_INFO("entry");
+        client->readOk(request.size());
+        if(flag){
+            client->setHttpStatusCode(HTTP_STATUS_CODE::OK);
+        } else{
+            client->setHttpStatusCode(HTTP_STATUS_CODE::NOT_FOUND);
+        }
+        return flag;
+    } else{
         return false;
     }
-
-    ::fstat(reqFileInfo_->fileFd_,&reqFileInfo_->fileStat_);
-    // 解析文件类型
-    flag = analyseFileType(requestFile);
-    return flag;
 }
 
 
