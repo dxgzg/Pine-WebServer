@@ -123,6 +123,7 @@ bool HttpParse::analyseFile(TcpClient* client,const string& request,postCallback
 
     // 如果文件不存在的话也就不需要解析类型
     if(!flag){
+        client->setParseStatus(PARSE_STATUS::PARSE_OK);
         LOG_INFO("未找到客户要的文件%s",reqFileInfo_->filePath_.c_str());
         return false;
     }

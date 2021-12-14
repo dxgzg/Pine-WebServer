@@ -106,16 +106,20 @@ int TcpClient::sendInLoop(std::string& msg){
     LOG_INFO("send msg n:%d",n);
     if(n == UINT64_MAX){
         state_ = STATE::DISCONNECT;
+        this->setParseStatus(PARSE_STATUS::PARSE_OK);
         LOG_INFO("send error");
         CloseCallback();
+        return -1;
     }
     auto headDet = loop_->getHeartConnect();
     headDet->add(clientFd_->getFd(),shared_from_this(),std::bind(&TcpClient::CloseCallback,this));
     if(msg.size() > n){
+        this->setParseStatus(PARSE_STATUS::PARSE_CONTINUE);// 还需要继续发送
         string s = msg.substr(n);
         outputBuffer_->addMessage(const_cast<char*>(s.c_str()),s.size());
         channel_->enableWriteEvent();
     }
+    this->setParseStatus(PARSE_STATUS::PARSE_OK);
     return n;
 }
 
@@ -134,23 +138,24 @@ void TcpClient::sendExtra(){
     LOG_INFO("send extra");
     // channel可写事件的回调函数。
     string msg = outputBuffer_->getAllString();
+    outputBuffer_->retrieve(msg.size());
     size_t n = outputBuffer_->send(clientFd_->getFd(),msg);
     auto headDet = loop_->getHeartConnect();
     headDet->add(clientFd_->getFd(),shared_from_this(),std::bind(&TcpClient::CloseCallback,this));
     if(n == UINT64_MAX){
         state_ = STATE::DISCONNECT;
+        this->setParseStatus(PARSE_STATUS::PARSE_OK);
         CloseCallback();
         return ;
     }
     if(n == msg.size() && outputBuffer_->readAble() == 0){
+        this->setParseStatus(PARSE_STATUS::PARSE_OK);
         channel_->disableWriteEvent();
     }
     else{
+        this->setParseStatus(PARSE_STATUS::PARSE_CONTINUE);
         string s = msg.substr(n);
         outputBuffer_->addMessage(const_cast<char*>(s.c_str()),s.size());
-    }
-    if(n == UINT64_MAX){
-        CloseCallback();
     }
 }
 
