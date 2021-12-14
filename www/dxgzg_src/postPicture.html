@@ -88,7 +88,6 @@
                         // e.target.result 获取 读取成功后的  文件DataURL
                         that.imageUrl = e.target.result
 
-
                         console.log(that.imageUrl);
                         let str = "addPicture"
                         axios.post(str, {
@@ -98,6 +97,8 @@
                         }).then(function(response) {
                             that.newMsg = ""
                             console.log("send")
+                            alert("上传成功")
+                            window.location.href = './showMyAlbum.html'
                         }, function(err) {
                             alert("error")
                             console.log(err);

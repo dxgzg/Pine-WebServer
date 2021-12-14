@@ -47,7 +47,7 @@ body {
     border: none;
     background-color: transparent;
     font-size: 32px;
-    color: #fff;
+    color: #756563;
     opacity: 0.5;
     position: absolute;
     outline: none;
@@ -60,13 +60,13 @@ body {
 
 .gallery .activePhoto button.previous {
     padding: 0 1em, 0 0.7em;
-    left: 0;
+    left: -55px;
     background: linear-gradient(to right, rgba(0, 0, 0, 0.0) 0%, rgba(0, 0, 0, 0, ) 100%);
 }
 
 .gallery .activePhoto button.next {
     padding: 0 0.7em, 0 1em;
-    right: 0;
+    right: -50px;
     background: linear-gradient(to right, rgba(0, 0, 0, 0.0) 0%, rgba(0, 0, 0, 0, ) 100%);
 }
 
