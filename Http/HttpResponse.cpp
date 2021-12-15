@@ -19,11 +19,10 @@ std::map<std::string,std::string> httpContentTypes = {
     {"tar","application/"},
     {"zip","application/"},
     {"html","text/"},
-    {"json","application/"}
+    {"json","application/"},
+    {"jpeg","image/"}
 };
 
-// 500KB
-static constexpr int BUFFSIZE = 1024 * 500;
 
 void HttpResponse::initHttpResponseHead(HTTP_STATUS_CODE code){
     responseHead_->initHttpResponseHead(code);
