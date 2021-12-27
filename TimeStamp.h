@@ -20,5 +20,15 @@ public:
 		);
         return buff;
     }
+	static std::string getGMT(){
+		time_t  now =time(0);
+		char  * data = ctime(&now);
+		tm  * gm =gmtime(&now);
+		data = asctime(gm);
+		std::string nowString = data;
+		nowString.pop_back(); // 去掉最后一个\n
+		nowString += " GMT";
+		return nowString;
+	}
 private:
 };
