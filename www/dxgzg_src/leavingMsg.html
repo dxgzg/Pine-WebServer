@@ -17,15 +17,20 @@
     <link rel="stylesheet" href="./css/bootstrap.min.css">
     <script src="./js/jquery-3.3.1.min.js"></script>
     <script src="./js/bootstrap.js"></script>
-    <!-- <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.9/vue.common.dev.js"></script> -->
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <script src="./js/vue-resource.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.9/vue.common.dev.js"></script>
+    <!-- <script src="js/vue.js"></script> -->
+    <!-- <script src="./js/vue-resource.js"></script> -->
     <script src="https://unpkg.com/axios@0.21.3/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
 
     <link rel="stylesheet" href="css/common.css" />
     <link rel="icon" href="img/ico.png" />
     <style>
-
+        /* .hidden {
+            display: none;
+        } */
     </style>
 
 </head>
@@ -37,6 +42,7 @@
             <li><a href="./message/index.html">文章</a></li>
             <li><a href="leavingMsg.html">留言</a></li>
             <li><a href="download.html">开源工具下载</a></li>
+            <li><a href="showMyAlbum.html">相册</a></li>
         </ul>
     </div>
     <div class="container" id="mybox">
@@ -55,79 +61,142 @@
                 <th class="text-center">序号</th>
                 <th class="text-center">内容</th>
                 <th class="text-center">时间</th>
+                <th class="text-center">回复开关</th>
             </tr>
-            <tr class="text-center" v-for="(item,index) in myData">
-                <td>{{index}}</td>
-                <td>{{item.content}}</td>
-                <td>{{item.time}}</td>
+            <tr class="text-center" v-for="(item,index) in myData" :key="index">
+                <td>{{index}}
+                    <p v-show="isShowFun(index,item.replyMsg)" :id="splicingId('p1',index)" style="white-space: pre-line;">
+                        回复内容:
+                    </p>
+
+                </td>
+
+                <td>{{item.content}}
+                    <p v-show="isShowFun(index,item.replyMsg)" :id="splicingId('p2',index)" style="white-space: pre-line;">
+                        {{item.replyMsg}}
+                    </p>
+                </td>
+
+                <td>{{item.time}}
+                    <p v-show="isShowFun(index,item.replyMsg)" :id="splicingId('p2',index)" style="white-space: pre-line;">
+                        {{item.replyTime}}
+                    </p>
+
+                </td>
+                <td>
+                    <textarea style="resize:none;display: none;" :id="splicingId('t',index)" @keyup.enter="reply(index)"></textarea>
+                    <button @click="reply(index)" :id="splicingId('brep',index)" style="resize:none;display: none;">回复 </button>
+
+                    <el-switch v-model="value[index]" active-color="#13ce66" inactive-color="#ff4949" @change="switchShow(index)">
+                    </el-switch>
+
+
+                </td>
+
             </tr>
         </table>
         <!--模态框 弹出框-->
     </div>
 
     <script>
+        function getId(idName) {
+            return document.getElementById(idName);
+        }
         let v = new Vue({
             el: '#mybox',
             data: {
                 myData: [],
                 newMsg: '',
+                value: []
             },
             mounted: function() {
                 this.getData()
                 console.log(this.myData)
             },
             methods: {
-                add: function() {
-                    if (this.newMsg === "") return;
-                    let str = `/addMsg`
-                        // this.$http.post(str, {
-                        //         content: this.newMsg
-                        //     }).then(function() {
-                        //         this.getData()
-                        //         this.newMsg = ''
-                        //     })
-                    var that = this;
-                    axios.post(str, {
-                        content: that.newMsg
-                    }).then(function(response) {
-                        console.log("post then")
-                        console.log(response)
+                switchShow: function(index) {
+                    let str = "t_" + index; // 文本框
+                    let str2 = "brep_" + index; // 回复按钮
+                    if (this.value[index]) {
+                        this.show(str);
+                        this.show(str2);
+                    } else {
+                        this.hidden(str);
+                        this.hidden(str2);
+                    }
+                },
+                send: function(funcName, jsonObj) {
+                    console.log("send")
+
+                    console.log(jsonObj)
+                    let that = this
+                    axios.post(funcName,
+                        jsonObj
+                    ).then(function(response) {
                         that.getData()
-                        that.newMsg = ""
-                        console.log("send")
                     }, function(err) {
                         alert("error")
                     });
                 },
-                deleteMsg: function(index) {
-                    if (index == -2) {
-                        this.myData = []
-                    } else {
-                        this.myData.splice(index, 1);
-                    }
+                add: function() {
+                    if (this.newMsg === "") return;
+                    let str = `/addMsg`
+                    let json = '{"content" :' + '"' + this.newMsg + '"}'
+                    console.log(json);
+                    this.send(str, JSON.parse(json));
+                    this.newMsg = ""
                 },
                 getData: function() {
-                    //发送get请求
-                    /*this.$http.get('msg.json', {}).then(function(resp) {
-                        //alert(resp);
-                        let res = resp.data.LeavingMsg
-                        this.myData = res
-                        console.log(res)
-                    }, function() {
-                        alert('请求失败处理');
-                    });*/
                     let that = this;
                     axios.get('msg.json').then(function(response) {
                         console.log(response);
                         that.myData = response.data.LeavingMsg;
                         that.myData.reverse();
                     }, function(err) {
-
+                        alert("get data error")
                     });
+                },
+                splicingId: function(name, index) { // 拼接一个id的名字
+                    return name + '_' + index;
+                },
+                isShowFun: function(index, reply) {
+                    // console.log("enter")
+                    if (reply == "undefined" || reply == null || reply == "") {
+                        return false;
+                    } else {
+                        return true;
+
+                    }
+                },
+                reply: function(index) {
+                    let str = 't_' + index;
+                    let d = getId(str);
+                    if (d.value === '') return
+
+                    console.log(this.myData.length - index - 1)
+                    let msg = d.value;
+
+                    // axios
+
+                    index = this.myData.length - index - 1
+
+                    str = `/addReplyMsg`
+                    let json = '{"replyMsg" :"' + msg + '"' + ',"index":' + index + '}'
+                    console.log(json);
+                    this.send(str, JSON.parse(json));
+                    d.value = "";
+
+                },
+                show: function(idName) {
+                    let d = getId(idName);
+                    d.style.display = "";
+                },
+                hidden: function(idName) {
+                    let d = getId(idName);
+                    d.style.display = "none";
                 }
             }
-
-        })
+        });
     </script>
 </body>
 

@@ -3,6 +3,8 @@
 #include "HttpResponse.h"
 #include "const.h"
 #include "Logger.h"
+#include "TimeStamp.h"
+#include "random.h"
 
 #include <regex>
 #include <gflags/gflags.h>
@@ -10,6 +12,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unordered_set>
+
 using namespace std;
 
 DEFINE_string(serverName,"Pine", "server name");
@@ -28,7 +31,6 @@ static unordered_set<string> filterSet{
 
 bool RequestFileInfo::fileIsExist(){
     fileFd_ = ::open(filePath_.c_str(),O_CLOEXEC | O_RDONLY);
-    LOG_INFO("file:%s fd:%d",filePath_.c_str(),fileFd_);
     if (fileFd_ < 0)
     {   // 说明未找到请求的文件
         return false;
@@ -49,6 +51,9 @@ void ResponseHead::initHttpResponseHead(HTTP_STATUS_CODE code){
         break;
     }
     responseHeader_ += "Server:" + FLAGS_serverName + "\r\n";
+    responseHeader_ += "Date:" + TimeStamp::getGMT() + "\r\n";
+    // responseHeader_ += "If-None-Match: 33a64df551425fcc55e4d42a148795d9f25f89d4\r\n";
+    // responseHeader_ += "ETag:" + getName(16) + "\r\n";
 }
 
 void ResponseHead::addResponseHead(const std::string& s){
@@ -110,7 +115,7 @@ bool HttpParse::analyseFile(TcpClient* client,const string& request,postCallback
             return false;
         }
 
-        size_t index = request.find("\"}");
+        size_t index = request.find("}");
         if(index == string::npos){ // 说明还需要继续读post过来的数据     
             return false;
         }
@@ -136,7 +141,6 @@ bool HttpParse::analyseFile(TcpClient* client,const string& request,postCallback
         // 如果文件不存在的话也就不需要解析类型
         if(!flag){
             LOG_INFO("未找到客户要的文件%s",reqFileInfo_->filePath_.c_str());
-            
         } else{
             ::fstat(reqFileInfo_->fileFd_,&reqFileInfo_->fileStat_);
             // 解析文件类型
@@ -145,8 +149,6 @@ bool HttpParse::analyseFile(TcpClient* client,const string& request,postCallback
     }
 
     if(client->getParseStatus() == PARSE_STATUS::PARSE_OK){// 解析完成要移动数据了
-       
-        LOG_INFO("entry");
         client->readOk(request.size());
 
         if(flag){

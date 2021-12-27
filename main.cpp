@@ -37,6 +37,7 @@ using namespace std;
 using namespace rapidjson;
 constexpr int BACKTRACE_SIZE = 16;
 DEFINE_string(func,"echo", "What function to do");
+DEFINE_string(passKey,"passKey", "post picture to album");
 
 void dump(void)
 {
@@ -100,57 +101,59 @@ void testEcho(){
     loop.loop();
 }
 
-// 处理业务逻辑代码
-bool postCb(string type,string args){
-    if(type == "/addMsg"){ //  添加留言
-        Document tmp;
-        tmp.Parse(args.c_str());
-        if(tmp.HasParseError()){
-            LOG_ERROR("parse args error args:%s",args.c_str());
-            return false;
-        }
-        if(!tmp.HasMember("content")){
-            LOG_ERROR("不含有content");
-            return false;
-        }
-        Document d;
-        FILE* fp = fopen("./www/dxgzg_src/msg.json","r");
-        char buffer[65536];
-        FileReadStream is(fp,buffer,sizeof(buffer));
+unordered_map<string,function<bool(string&)>>g_cbList;
+bool addMsg(string& args){
 
-        d.ParseStream(is);
+    Document tmp;
+    tmp.Parse(args.c_str());
+    if(tmp.HasParseError()){
+        LOG_ERROR("parse args error args:%s",args.c_str());
+        return false;
+    }
+    if(!tmp.HasMember("content")){
+        LOG_ERROR("不含有content");
+        return false;
+    }
+    Document d;
+    FILE* fp = fopen("./www/dxgzg_src/msg.json","r");
+    char buffer[65536];
+    FileReadStream is(fp,buffer,sizeof(buffer));
 
-        Value key(kObjectType);
-        Value value;
-        const char* str = tmp["content"].GetString();
-        value.SetString(str,strlen(str));
-        cout << value.GetString() << endl;
-        key.AddMember("content",value,d.GetAllocator());
- 
-        if(!d.HasMember("LeavingMsg")){
-            cout << "不含有leavingMsg" << endl;
-            return false;
-        }
+    d.ParseStream(is);
+    fclose(fp);
+    if(!d.HasMember("LeavingMsg")){
+        cout << "不含有leavingMsg" << endl;
+        return false;
+    }
 
-        string now = TimeStamp::Now();
-        value.SetString(now.c_str(),now.size());
-        key.AddMember("time",value,d.GetAllocator());
-        
-        d["LeavingMsg"].PushBack(key,d.GetAllocator());
-        fclose(fp);
+    Value key(kObjectType);
+    Value value;
+    const char* str = tmp["content"].GetString();
+    value.SetString(str,strlen(str));
+    cout << value.GetString() << endl;
+    key.AddMember("content",value,d.GetAllocator());
 
-        char writerbuffer[65536];
-        fp = fopen("./www/dxgzg_src/msg.json","wr");
-        FileWriteStream os(fp,writerbuffer,sizeof(writerbuffer));
+    string now = TimeStamp::Now();
+    value.SetString(now.c_str(),now.size());
+    key.AddMember("time",value,d.GetAllocator());
     
-        Writer<FileWriteStream> writer(os);
-        d.Accept(writer);
+    d["LeavingMsg"].PushBack(key,d.GetAllocator());
 
-        fclose(fp);
 
-        return true;
-    } else if(type == "/addPicture"){
-        Document tmp;
+    char writerbuffer[65536];
+    fp = fopen("./www/dxgzg_src/msg.json","wr");
+    FileWriteStream os(fp,writerbuffer,sizeof(writerbuffer));
+
+    Writer<FileWriteStream> writer(os);
+    d.Accept(writer);
+    
+    fclose(fp);
+
+    return true;
+}
+
+bool addPicture(string& args){
+    Document tmp;
         tmp.Parse(args.c_str());
 
         if(tmp.HasParseError()){    
@@ -167,7 +170,7 @@ bool postCb(string type,string args){
             return false;
         }
         string passKey = tmp["passKey"].GetString();
-        if(passKey != ""){
+        if(passKey != FLAGS_passKey){
             cout << tmp["passKey"].GetString() << endl;
             LOG_ERROR("passKey error");
             return false;
@@ -197,7 +200,7 @@ bool postCb(string type,string args){
         ofstream os(picname,ios::out | ios::binary);
         if(!os || !os.is_open() || os.bad() || os.fail()){
             cout << "file open error" << endl;
-            return -1;
+            return false;
         }
         os << imgdecode64;
         os.close();
@@ -226,9 +229,85 @@ bool postCb(string type,string args){
         fclose(fp);
 
         return true;
+}
+
+bool addReplyMsg(string& args){
+    Document tmp;
+    tmp.Parse(args.c_str());
+    if(tmp.HasParseError()){
+        LOG_ERROR("parse args error args:%s",args.c_str());
+        return false;
     }
-    return false;
-}   
+    if(!tmp.HasMember("replyMsg") || !tmp.HasMember("index")){
+        LOG_ERROR("不含有replyMsg");
+        return false;
+    }
+
+    Document d;
+    FILE* fp = fopen("./www/dxgzg_src/msg.json","r");
+    char buffer[65536];
+    FileReadStream is(fp,buffer,sizeof(buffer));
+
+    d.ParseStream(is);
+    fclose(fp);
+    if(!d.HasMember("LeavingMsg")){
+        cout << "不含有leavingMsg" << endl;
+        return false;
+    }
+    cout << "it is ok" << endl;
+
+    int index = tmp["index"].GetInt();
+    string s = tmp["replyMsg"].GetString();
+    Value value;
+
+    // 添加MSG
+    if(d["LeavingMsg"][index].HasMember("replyMsg")){
+        s = s + '\n' +  d["LeavingMsg"][index]["replyMsg"].GetString();
+        value.SetString(s.c_str(),s.size());
+        d["LeavingMsg"][index]["replyMsg"] = value;
+    } else{  
+        value.SetString(s.c_str(),s.size()); // 添加完member会释放value的值
+        d["LeavingMsg"][index].AddMember("replyMsg",value,d.GetAllocator());
+    }
+
+    string now = TimeStamp::Now();
+    
+    
+    // 添加replyTime
+    if(d["LeavingMsg"][index].HasMember("replyTime")){
+        now = now + '\n' + d["LeavingMsg"][index]["replyTime"].GetString();
+        value.SetString(now.c_str(),now.size());
+        d["LeavingMsg"][index]["replyTime"] = value;
+    } else{
+        value.SetString(now.c_str(),now.size());
+        d["LeavingMsg"][index].AddMember("replyTime",value,d.GetAllocator());
+    }
+
+
+    char writerbuffer[65536];
+    fp = fopen("./www/dxgzg_src/msg.json","wr");
+    FileWriteStream os(fp,writerbuffer,sizeof(writerbuffer));
+
+    Writer<FileWriteStream> writer(os);
+    d.Accept(writer);
+    
+    fclose(fp);
+
+    return true;
+}
+// 处理业务逻辑代码
+bool postCb(string type,string args){
+    if(!g_cbList.count(type)){
+        LOG_ERROR("不含有此回调函数");
+        return false;
+    }
+    bool flag = g_cbList[type](args);
+    cout << "flag:" << flag << endl;
+    return flag;
+}
+void addCbFun(string funName,function<bool(string&)> cb){
+    g_cbList[funName] = cb;
+}
 void testHttp(){
     HttpServer http;
     http.setPostReadCallback(std::bind(postCb,std::placeholders::_1,std::placeholders::_2));
@@ -241,9 +320,13 @@ int main(int argc, char** argv){
     std::ostringstream oss;
     oss << std::this_thread::get_id();
     LOG_INFO("main  thread id:%s start server:%s",oss.str().c_str(),FLAGS_func.c_str());
+    
     if(FLAGS_func == "echo"){
         testEcho();
     } else if(FLAGS_func == "http"){
+        addCbFun("/addMsg",std::bind(addMsg,std::placeholders::_1));
+        addCbFun("/addPicture",std::bind(addPicture,std::placeholders::_1));
+        addCbFun("/addReplyMsg",std::bind(addReplyMsg,std::placeholders::_1));
         testHttp();
     }
     
