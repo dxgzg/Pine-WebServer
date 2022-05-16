@@ -40,10 +40,12 @@ bool RequestFileInfo::getFileStat(){
         fileType_ = "html";// 校正一下html
         // todo 可以加载个默认404页面
         filePath_ = FLAGS_path +"/404.html";
+        fileFd_ = ::open(filePath_.c_str(),O_CLOEXEC | O_RDONLY); // 404.html必存在
         flag = false;
     }
     ::fstat(fileFd_,&fileStat_);
     fileSize_ = fileStat_.st_size;
+    LOG_INFO("request file exist：%s",filePath_.c_str());
     return flag;
  }
 
@@ -54,7 +56,7 @@ void ResponseHead::initHttpResponseHead(HTTP_STATUS_CODE code){
         responseHeader_ = "HTTP/1.1 200 OK\r\n";//Origin:*\r\n
         break;
     case HTTP_STATUS_CODE::NOT_FOUND:
-        responseHeader_ = "HTTP/1.1 404 NOTFOUND\r\nContent-Length:0\r\n";
+        responseHeader_ = "HTTP/1.1 404 NOTFOUND\r\n";
         break;
     default: 
         break;
@@ -186,7 +188,7 @@ bool HttpParse::analyseFile(const string& request){
             return false;
         }
     }
-    LOG_INFO("parse ok");
+    LOG_INFO("request file exist");
     return true;
     //todo: 如果HTTP头文件缺少
 //    size_t lastLineIndex = 0;
@@ -264,6 +266,7 @@ bool HttpParse::setResponseFile(std::string& requestFile){
         header_->reqFileInfo_->filePath_ = path_;
         header_->reqFileInfo_->filePath_ += requestFile; 
     }
+    LOG_INFO("request file path :%s",header_->reqFileInfo_->filePath_.c_str());
 
     // 先看文件是否存在，这样方便设置404
     bool flag = header_->reqFileInfo_->getFileStat();

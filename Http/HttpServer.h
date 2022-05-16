@@ -39,4 +39,4 @@ public:
 // todo messages cmake 乱码
 // todo gdb-server
 // todo g++报错
-// todo 如果有数据，先发送完在关闭连接，长连接且不使用代理不会触发这个bug
+// todo 压缩图片

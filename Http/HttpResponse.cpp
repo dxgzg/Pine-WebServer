@@ -105,11 +105,6 @@ void HttpResponse::addHeaderEnd() {
     responseHead_->responseHeader_ += s;
 }
 
-// todo: 添加post响应头文件
-bool setPostHeaderResponse(Header *header) {
-
-}
-
 void HttpResponse::setConnection(Header *header) {
     // 判断是否添加keep-alive
     if (header->kv_.find("Connection") != header->kv_.end() && header->kv_["Connection"] != "close"
@@ -133,7 +128,8 @@ void HttpResponse::setContentType(Header *header) {
     string key = "Content-Type";
     string value = "";
     if (header->method_ == "GET") {
-        value = httpContentTypes[header->reqFileInfo_->fileType_];// 没有的文件也不会走到这一步的
+        // 找不到类型，在上层就处理掉了，变成404.html了
+        value = httpContentTypes[header->reqFileInfo_->fileType_];
     } else if (header->method_ == "POST") {
         value = httpContentTypes["json"];
     }

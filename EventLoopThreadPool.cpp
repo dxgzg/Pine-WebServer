@@ -23,6 +23,7 @@ void EventLoopThreadPool::start(){
 }
 EventLoop* EventLoopThreadPool::getNextLoop(){
     if(next_ >= eventLoopPtrPool_.size()){next_ = 0;}
+    // todo 为什么输出是1
     LOG_INFO("线程个数:%lu",eventLoopPtrPool_.size());
     if(eventLoopPtrPool_[next_]->getLoop() == nullptr){
         LOG_FATAL("O NO线程池出错了");
@@ -31,7 +32,7 @@ EventLoop* EventLoopThreadPool::getNextLoop(){
 }
 EventLoopThreadPool::~EventLoopThreadPool(){
     for(size_t i = 0;i < eventLoopPtrPool_.size();++i){
-        threadPool_[i].detach(); // 先让他们放飞自我，后期会修改的
+        threadPool_[i].detach(); // todo 先让他们放飞自我，后期会修改的
     }
 }
 
