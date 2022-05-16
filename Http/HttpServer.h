@@ -38,3 +38,4 @@ public:
 // todo 研究clion左移键子
 // todo messages cmake 乱码
 // todo gdb-server
+// todo g++报错

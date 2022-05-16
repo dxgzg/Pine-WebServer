@@ -1,3 +1,0 @@
-/home/dxgzg/Pine/cmake-build-debug/CMakeFiles/Pine.dir
-/home/dxgzg/Pine/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/dxgzg/Pine/cmake-build-debug/CMakeFiles/rebuild_cache.dir
