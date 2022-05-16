@@ -1,1 +1,1 @@
-./Pine --flagfile server.conf
+  ./Pine --flagfile server.conf

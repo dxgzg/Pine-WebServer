@@ -4,6 +4,7 @@
 #include "const.h"
 #include "Logger.h"
 #include "TimeStamp.h"
+#include "Header.h"
 #include "random.h"
 
 #include <regex>
@@ -15,7 +16,7 @@
 
 using namespace std;
 
-DEFINE_string(serverName,"Pine", "server name");
+
 DEFINE_string(index,"run.html", "web index html");
 DEFINE_string(path,"./www/dxgzg_src", "html path");
 
@@ -29,13 +30,21 @@ static unordered_set<string> filterSet{
     "user"
 };
 
-bool RequestFileInfo::fileIsExist(){
+bool RequestFileInfo::getFileStat(){
     fileFd_ = ::open(filePath_.c_str(),O_CLOEXEC | O_RDONLY);
+    bool flag = true;
     if (fileFd_ < 0)
-    {   // 说明未找到请求的文件
-        return false;
+    {
+        // 说明未找到请求的文件
+        LOG_ERROR("file not exist:%s",filePath_.c_str());
+        fileType_ = "html";// 校正一下html
+        // todo 可以加载个默认404页面
+        filePath_ = FLAGS_path +"/404.html";
+        flag = false;
     }
-    return true;
+    ::fstat(fileFd_,&fileStat_);
+    fileSize_ = fileStat_.st_size;
+    return flag;
  }
 
 void ResponseHead::initHttpResponseHead(HTTP_STATUS_CODE code){
@@ -50,29 +59,20 @@ void ResponseHead::initHttpResponseHead(HTTP_STATUS_CODE code){
     default: 
         break;
     }
-    responseHeader_ += "Server:" + FLAGS_serverName + "\r\n";
-    responseHeader_ += "Date:" + TimeStamp::getGMT() + "\r\n";
-    // responseHeader_ += "If-None-Match: 33a64df551425fcc55e4d42a148795d9f25f89d4\r\n";
-    // responseHeader_ += "ETag:" + getName(16) + "\r\n";
 }
-
-void ResponseHead::addResponseHead(const std::string& s){
-    responseHeader_ += s;
-}
-
 
 HttpInfo::HttpInfo():response_(make_unique<HttpResponse>())
                     ,request_(make_unique<HttpRequest>())
-                    ,parse_(make_unique<HttpParse>())
-{
-
-}
+                    ,parse_(make_unique<HttpParse>()){}
 
 HttpParse::HttpParse():path_(FLAGS_path),
-                        reqFileInfo_(make_unique<RequestFileInfo>()),method_()
-{
+                        header_(make_unique<Header>()){}
 
+void HttpParse::setError(){
+    header_->status_ = PARSE_STATUS::PARSE_ERROR;
+    header_->code_ = HTTP_STATUS_CODE::NOT_FOUND;
 }
+
 bool HttpParse::simpleFilter(std::string& s){
     auto npos = std::string::npos;
     for(auto& val : filterSet){
@@ -80,119 +80,210 @@ bool HttpParse::simpleFilter(std::string& s){
     }
     return true;
 }
-bool HttpParse::analyseFile(TcpClient* client,const string& request,postCallback& cb)
-{
-    regex reg(pattern_);
-    smatch mas;
-    regex_search(request,mas,reg);
 
-
-    // 因为下标0是代表匹配的整体
-    if(mas.size() < 3 ){
-        LOG_ERROR("不是正常请求");
-        client->setParseStatus(PARSE_STATUS::PARSE_OK);
-        client->setHttpStatusCode(HTTP_STATUS_CODE::NOT_FOUND);
-        // 啥都不是直接返回false
+bool HttpParse::parseRequestLine(const std::string& oneData,size_t oneIndex){
+    size_t index1 = oneData.find(" ");
+    size_t index2 = oneData.find(" ",index1 + 1);
+    if(index1 == string::npos || index2 == string::npos){
+        LOG_ERROR("http header error:%s",oneData.c_str());
         return false;
     }
-    //请求文件类型
-    string method = mas[1];
-    setMethod(method);
- 
-    // 请求的具体文件
-    string requestFile = mas[2];
-    bool flag = true;
-    /*
-    * POST传数据，可接受到JSON文件，GET的话会转码
-    * POST暂时不去重构
-    */
-    if(method_ == METHOD::POST){
-        client->setParseStatus(PARSE_STATUS::PARSE_CONTINUE);
-        
-        
-        size_t start = request.find_last_of("\r\n");
-        if(start == string::npos){
-            return false;
-        }
 
-        size_t index = request.find("}");
-        if(index == string::npos){ // 说明还需要继续读post过来的数据     
-            return false;
-        }
-        client->setParseStatus(PARSE_STATUS::PARSE_OK);
-        string args = request.substr(start + 1);
+    string method = oneData.substr(0,index1);
 
-        // if(!simpleFilter(args)){ // 没有通过过滤的话
-        //     LOG_ERROR("not pass fiter");
-        //     return false;
-        // }
-        flag = cb(requestFile,args);
+    // 判断请求方式
+    bool ans = parseMethod(method);
+    if(!ans){
+        LOG_ERROR("parse method error%s",method.c_str());
+        return false;
+    }
+
+    // 解析url中携带的参数
+    string path = oneData.substr(index1 + 1,index2 - index1 - 1);
+    size_t flagSpilt = path.find("?"); // 找到?
+    if(flagSpilt != string::npos){
+        header_->requestURI = path.substr(0,flagSpilt);
+
+        string query = path.substr(flagSpilt + 1);
+        size_t pos = 0;
+        while(1){
+            size_t endIndex = query.find("&",pos);
+            auto p = spilt(query,"=",pos,endIndex,1);
+            if(p.first == "" && p.second == "")break;
+            header_->queryData_[p.first] = p.second;
+        }
     } else{
-        client->setHttpStatusCode(HTTP_STATUS_CODE::NOT_FOUND);
-        client->setParseStatus(PARSE_STATUS::PARSE_OK);// 直接默认GET请求是读完的了
-        // 先获取请求的文件
-        setResponseFile(requestFile);
+        header_->requestURI = path;
+    }
+    
+    //todo: 判断HTTP版本
+//    string httpVersion = oneData.substr(index2 + 1,oneIndex - index2 - 1);
 
-        LOG_INFO("parse request file:%s",requestFile.c_str());
+    return true;
+}
 
-        flag = reqFileInfo_->fileIsExist();
-        reqFileInfo_->fileName_ = requestFile;
+void HttpParse::parseRequestKV(const std::string& request,size_t startIndex,size_t lastLineIndex){
+    // 解析头文件各个字段属性
+    size_t index = startIndex; // 偏移量,第一行的后面
+    size_t endIndex = 0;
 
-        // 如果文件不存在的话也就不需要解析类型
+    while( index < lastLineIndex && ((endIndex = request.find("\r\n",index)) != string::npos)){
+        auto p = spilt(request,":",index,endIndex,2);
+        header_->kv_[p.first] = p.second;
+    }
+}
+
+
+// todo 解决粘包的问题
+bool HttpParse::analyseFile(const string& request){
+    if(header_->status_ == PARSE_STATUS::PARSE_NONE){
+        // 解析HTTP第一行数据
+        size_t oneIndex = request.find("\r\n");
+        string oneData = request.substr(0, oneIndex);
+        bool flag = parseRequestLine(oneData,oneIndex);
         if(!flag){
-            LOG_INFO("未找到客户要的文件%s",reqFileInfo_->filePath_.c_str());
+            setError();
+            return false;
+        }
+        // 判断HTTP头文件是否完整
+        size_t lastLineIndex = request.find("\r\n\r\n");
+        if(lastLineIndex == string::npos){
+            setError();
+            return false;
+        }
+
+        // 解析HTTP头文件的各个属性
+        parseRequestKV(request,oneIndex + 2,lastLineIndex);// \r\n占两个字节
+
+        // 解析body数据并且判断是否接收完成
+        flag = parseBody(request,lastLineIndex);
+        if(!flag){
+            header_->status_ = PARSE_STATUS::PARSE_BODY_CONTINUE;
+            return false;
+        }
+
+        setParseOK();
+    } else if(header_->status_ == PARSE_STATUS::PARSE_BODY_CONTINUE){
+        // todo 这里可能会遇到>的情况，就是粘包，后期需要改善
+        int cLength = stoi(header_->kv_["Content-Length"]);
+        if(header_->bodyTmp_.size() + request.size() == cLength){
+            setParseOK();
+            header_->bodyData_ = move(header_->bodyTmp_) + move(request);
         } else{
-            ::fstat(reqFileInfo_->fileFd_,&reqFileInfo_->fileStat_);
-            // 解析文件类型
-            flag = analyseFileType(requestFile);    
+            header_->bodyTmp_ += move(request);
+            return false;
         }
     }
 
-    if(client->getParseStatus() == PARSE_STATUS::PARSE_OK){// 解析完成要移动数据了
-        client->readOk(request.size());
+    LOG_INFO("parse ok method:%s uri:%s jsonData:%s",header_->method_.c_str(),
+             header_->requestURI.c_str(),header_->bodyData_.c_str());
 
-        if(flag){
-            client->setHttpStatusCode(HTTP_STATUS_CODE::OK);
-        } else{
-            client->setHttpStatusCode(HTTP_STATUS_CODE::NOT_FOUND);
+    // todo 设置请求文件
+    if(header_->method_ == "GET"){
+        bool flag = setResponseFile(header_->requestURI);
+        if(!flag){
+            setError();
+            return false;
         }
-        return flag;
+    }
+    LOG_INFO("parse ok");
+    return true;
+    //todo: 如果HTTP头文件缺少
+//    size_t lastLineIndex = 0;
+//    lastLineIndex = request.find("\r\n\r\n");
+//    if(lastLineIndex == string::npos){
+//        header_->status_ = PARSE_STATUS::PARSE_HEADER_CONTINUE;
+//        header_->headerTmp_ += request;
+//
+//        LOG_ERROR("need more data");
+//        return false;
+//    }
+
+}
+
+void HttpParse::setParseOK(){
+    header_->status_ = PARSE_STATUS::PARSE_OK;
+    header_->code_ = HTTP_STATUS_CODE::OK;
+}
+
+bool HttpParse::parseBody(const std::string& request,size_t lastLineIndex){
+    auto it = header_->kv_.find("Content-Length");
+    if(it != header_->kv_.end()){
+        size_t dataIndex = lastLineIndex + 4;
+        string data = request.substr(dataIndex);
+
+        int cLength = stoi(it->second);
+        if(cLength != data.size()){
+            header_->bodyTmp_.reserve(cLength);
+            header_->bodyTmp_ += std::move(data);
+            return false;
+        } else{
+            header_->bodyData_ = move(data);
+        }
+    }
+
+    return true;
+}
+
+bool HttpParse::parseMethod(std::string& method){
+    for(auto& c :method){
+        toupper(c);
+    }
+    if(METHOD.find(method) == METHOD.end())return false;
+
+    header_->method_ = method;
+    return true;
+}
+
+// pos:偏移量注意是个引用,endIndex:参数结尾的下标.addPos:校正偏移量
+pair<string,string> HttpParse::spilt(const string& s,string sep,size_t& pos,size_t endIndex,size_t addPos){
+    size_t startIndex = s.find(sep,pos);
+    if(startIndex == string::npos)return pair<string,string>();
+    string key = s.substr(pos,startIndex - pos);
+
+    string value ="";
+    if(endIndex == string::npos){ // 比如 name=dxgzg,后面没有&就需要走第一个了。
+        value =  s.substr(startIndex + 1);
+        pos = s.size(); // endIndex + 1就等于0了，正数溢出
     } else{
-        return false;
+        value = s.substr(startIndex + 1, endIndex - startIndex - 1);
+        pos = endIndex + addPos;// ex: \r\n偏移量加2,&偏移量加1
     }
+
+    pair<string,string> ans(key,value);
+    return ans;
 }
 
-
-// 设置请求的方式
-void HttpParse::setMethod(const std::string& method){
-    if(method == "GET"){
-        method_ = METHOD::GET;
-    }
-    else if(method == "POST"){
-        method_ = METHOD::POST;
-    }
-    LOG_INFO("请求的方式为:%s",method.c_str());
-}
-
-void HttpParse::setResponseFile(std::string& requestFile){
+bool HttpParse::setResponseFile(std::string& requestFile){
+    // 设置请求
     if (requestFile == "/")
     { // 如果是/的话就给默认值
-        reqFileInfo_->filePath_ = path_+ FLAGS_index;
+        header_->reqFileInfo_->filePath_ = path_+ FLAGS_index;
         requestFile = FLAGS_index;
+    }else{
+        header_->reqFileInfo_->filePath_ = path_;
+        header_->reqFileInfo_->filePath_ += requestFile; 
     }
-    else
-    {
-        reqFileInfo_->filePath_ = path_;
-        reqFileInfo_->filePath_ += requestFile; 
-    }
-    LOG_INFO("filePath: %s",reqFileInfo_->filePath_.c_str());
-    LOG_INFO("name: %s",requestFile.c_str());
+
+    // 先看文件是否存在，这样方便设置404
+    bool flag = header_->reqFileInfo_->getFileStat();
+    if(!flag)return false;
+
+    flag = analyseFileType(header_->reqFileInfo_->filePath_ );
+    if(!flag)return false;
+
+
+
+    return true;
 }
 
 bool HttpParse::analyseFileType(const std::string& requestFile){
      size_t i = requestFile.find_last_of(".");	
-     if(i == string::npos)return false;
-     reqFileInfo_->fileType_ = requestFile.substr(i + 1);
+     if(i == string::npos) {
+         LOG_ERROR("parse file type error:%s",requestFile.c_str());
+         return false;
+     }
+     header_->reqFileInfo_->fileType_ = requestFile.substr(i + 1);
      return true;
 }
 
@@ -205,16 +296,27 @@ void RequestFileInfo::reset(){
 }
 
 void HttpParse::reset(){
-    this->reqFileInfo_->reset();
+    this->header_->reqFileInfo_->reset();
+    this->header_.reset(new Header());
 }
 
 void HttpResponse::reset(){
     responseHead_->responseHeader_ = "";
+    respData_ = "";
 }
 
 void HttpInfo::reset(){
+    if(!isParseFinish())return ;
     this->response_->reset();
     this->parse_->reset();
+}
+
+bool HttpInfo::isParseFinish(){
+    if(parse_->getHeader()->status_ == PARSE_STATUS::PARSE_BODY_CONTINUE ||
+       parse_->getHeader()->status_ == PARSE_STATUS::PARSE_HEADER_CONTINUE){
+        return false;
+    }
+    return true;
 }
 
 RequestFileInfo::~RequestFileInfo() = default;

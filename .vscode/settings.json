@@ -61,8 +61,9 @@
         "numbers": "cpp",
         "semaphore": "cpp",
         "stop_token": "cpp",
-        "unordered_set": "cpp"
+        "unordered_set": "cpp",
+        "complex": "cpp"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
-    "liveServer.settings.port": 5501
+    "liveServer.settings.port": 5502
 }

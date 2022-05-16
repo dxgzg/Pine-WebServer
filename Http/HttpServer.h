@@ -9,10 +9,12 @@
 #include "TcpClientCallback.h"
 #include "TcpServer.h"
 #include "EventLoop.h"
+#include "HttpCallback.h"
 
 class TcpClient;
 class Buffer;
 class HttpInfo;
+
 
 class HttpServer{
 private:
@@ -26,6 +28,13 @@ public:
     // 用户自定义的回调函数要正确的处理异常和自己负责关闭套接字
     void ReadCallback(Pine::clientPtr t,Buffer* inputBuffer);
     void run();
-    void setPostReadCallback(callback cb){ postCallback_ = std::move(cb);}
+    // todo 待修改
+    void setPostReadCallback(callback cb){
+        HttpCallback::setPostCB(cb);
+    }
     ~HttpServer();
+
 };
+// todo 研究clion左移键子
+// todo messages cmake 乱码
+// todo gdb-server

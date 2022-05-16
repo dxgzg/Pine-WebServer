@@ -61,18 +61,18 @@ void HeartConnect::add(int fd,std::shared_ptr<TcpClient> cPtr,std::function<void
 
 void HeartConnect::adjust(int fd){
     assert(isSameThread(loop_->getThreadId()));
-    LOG_INFO("adjust fd:%d",fd);
+    // LOG_INFO("adjust fd:%d",fd);
     if(fdMap_.find(fd) == fdMap_.end()){
-        LOG_INFO("不存在fd");
+        // LOG_INFO("不存在fd");
     } else{
-        LOG_INFO("存在fd:%d",fd);
+        // LOG_INFO("存在fd:%d",fd);
         auto ptr = fdMap_[fd];
         ptr->time_ = getNow();
         auto it = NodeMap_[ptr];
         NodeList_.erase(it);
         NodeList_.emplace_front(ptr);
         NodeMap_[ptr] = NodeList_.begin();
-        LOG_INFO("end");
+        // LOG_INFO("end");
     }
 }
 
@@ -121,6 +121,7 @@ void HeartConnect::destroyConnect(NodePtr ptr){
 }
 
 void HeartConnect::clientCloseCallback(int fd){
+      assert(isSameThread(loop_->getThreadId()));
     if(fdMap_.find(fd) != fdMap_.end()){
         auto ptr = fdMap_[fd];
         destroyConnect(ptr);

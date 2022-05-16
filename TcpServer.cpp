@@ -54,14 +54,14 @@ void TcpServer::closeInLoop(Pine::clientPtr& t){
     if(clientMap_.find(closeFd) != clientMap_.end()){
         clientMap_.erase(closeFd);
     }
-    LOG_INFO("closeInLoop use count:%ld",t.use_count());
+    // LOG_INFO("closeInLoop use count:%ld",t.use_count());
 }   
 
 // 子线程处理完给主线程处理。
 void TcpServer::handleClose(Pine::clientPtr& t){
     // LOG_INFO("handleClose delete thread id:%zu",std::this_thread::get_id());
 
-    LOG_INFO("handleClose use count:%ld",t.use_count());
+    // LOG_INFO("handleClose use count:%ld",t.use_count());
     loop_->runInLoop(std::bind(&TcpServer::closeInLoop,this,t));
 } 
 

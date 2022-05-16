@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.5)
+# cmake_minimum_required(VERSION 2.6)
 # project(PineNetWork VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -20,8 +20,8 @@ aux_source_directory(. SRC_LIST1)
 aux_source_directory(rapidjson SRC_LIST2)
 aux_source_directory(Http SRC_LIST3)
 
-
 add_executable(Pine ${SRC_LIST1} ${SRC_LIST2} ${SRC_LIST3})
+#add_executable(Pine ${SRC_LIST1} ${SRC_LIST2} ${SRC_LIST3} Http/Header.h Http/HttpCallback.cpp Http/HttpCallback.h Http/Header.cpp)
 # 加一个动态链接库
 target_link_libraries(Pine pthread gflags)
 # sylar的cmake解决FILE不是相对路径的问题

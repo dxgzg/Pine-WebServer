@@ -64,14 +64,20 @@
                 <th class="text-center">回复开关</th>
             </tr>
             <tr class="text-center" v-for="(item,index) in myData" :key="index">
-                <td>{{index}}
+                <td>
+                    <!-- <p style="margin:0;padding:0;"> -->
+                    {{index}}
+                    <!-- </p> -->
+
                     <p v-show="isShowFun(index,item.replyMsg)" :id="splicingId('p1',index)" style="white-space: pre-line;">
                         回复内容:
                     </p>
 
                 </td>
 
-                <td>{{item.content}}
+                <td>
+                    {{item.content}}
+
                     <p v-show="isShowFun(index,item.replyMsg)" :id="splicingId('p2',index)" style="white-space: pre-line;">
                         {{item.replyMsg}}
                     </p>

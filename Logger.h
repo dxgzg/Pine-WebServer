@@ -7,6 +7,8 @@ enum class Level{
         ERROR,
         FATAL,
 };
+// todo 修改日志模块
+// todo 除了INFO其他日志没有 代码行号
 #define LOG_INFO(logmsgFormat,...) \
     do \
     { \

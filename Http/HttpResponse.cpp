@@ -1,102 +1,158 @@
 #include "HttpResponse.h"
 #include "HttpParse.h"
+#include "Header.h"
+#include "HttpRequest.h"
+#include "TimeStamp.h"
+#include "HttpCallback.h"
+
 #include <sys/sendfile.h>
 #include <gflags/gflags.h>
-using namespace std;
-
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 
-using namespace rapidjson;
+#if 1
 
-std::map<std::string,std::string> httpContentTypes = {
-    {"js","application/x-javascript"},
-    {"css","text/"},
-    {"png","image/"},
-    {"jpg","image/"},
-    {"tar","application/"},
-    {"zip","application/"},
-    {"html","text/"},
-    {"json","application/"},
-    {"jpeg","image/"}
+#include <chrono>
+#include <iostream>
+
+using namespace std::chrono;
+using namespace std;
+#endif
+
+using namespace rapidjson;
+DEFINE_string(serverName, "Pine", "server name");
+std::map<std::string, std::string> httpContentTypes = {
+        {"js",   "application/x-javascript"},
+        {"css",  "text/css"},
+        {"png",  "image/png"},
+        {"jpg",  "image/jpg"},
+        {"tar",  "application/tar"},
+        {"zip",  "application/zip"},
+        {"html", "text/html"},
+        {"json", "application/json"},
+        {"jpeg", "image/jpeg"}
 };
 
 
-void HttpResponse::initHttpResponseHead(HTTP_STATUS_CODE code){
+void HttpResponse::initHttpResponseHead(HTTP_STATUS_CODE code) {
     responseHead_->initHttpResponseHead(code);
-}
-HttpResponse::HttpResponse():responseHead_(make_unique<ResponseHead>()){}
 
-
-void HttpResponse::SendFile(TcpClient* client,bool isRequestOk,std::unique_ptr<HttpInfo>& httpInfo)
-{   
-    if(client->getParseStatus() != PARSE_STATUS::PARSE_OK){
-        return ;
-    }
-
-    unique_ptr<RequestFileInfo>& reqFileInfo = httpInfo->parse_->getFileInfo();
-    // å‘é€httpå¤´
-    size_t len = client->send(responseHead_->responseHeader_);
-    LOG_INFO("head:%s",responseHead_->responseHeader_.c_str());
-
-    // å‘å®Œäº†å¤´ï¼Œåœ¨å‘è¯·æ±‚æ–‡ä»¶çš„ä¿¡æ¯ã€‚å¦‚æžœæ˜¯404è¿™é‡Œæ˜¯æ²¡æœ‰çš„
-    if (client->getHttpStatusCode() != HTTP_STATUS_CODE::NOT_FOUND && reqFileInfo->fileFd_ != -1)
-    {   
-        LOG_INFO("ENTRY filefd:%d",reqFileInfo->fileFd_);
-        char* buff = (char*)malloc(reqFileInfo->fileSize_);
-        ::read(reqFileInfo->fileFd_,buff,reqFileInfo->fileSize_);
-        string s(buff,reqFileInfo->fileSize_); // æ€§èƒ½ä¼šæŸå¤±ï¼Œä½†æ˜¯ä¸éœ€è¦åˆ¤æ–­äºŒè¿›åˆ¶äº†
-        client->send(std::move(s));
-        free(buff);    
-        // å‘é€å®Œæ–‡ä»¶å…³é—­å¥—æŽ¥å­—
-        close(reqFileInfo->fileFd_);
-
-    } else if(httpInfo->parse_->getMethod() == METHOD::POST){
-        LOG_INFO("POST");
-        // client->CloseCallback();
-        client->send("{\"error\":0}");
-    }
-
+    addHttpResponseHead("Server", FLAGS_serverName);
+    addHttpResponseHead("Date", TimeStamp::getGMT());
 }
 
-void HttpResponse::addHttpResponseHead(const string& head){
-    responseHead_->responseHeader_ += head;
-}
+HttpResponse::HttpResponse() : responseHead_(make_unique<ResponseHead>()), respData_("") {}
 
-void HttpResponse::processHead(unique_ptr<HttpParse>& httpParse)
-{
-    string connect = "Connection:keep-alive";
-    addHeader(connect);
-
-    string ContentType = "Content-Type:";
-    string fileType = httpParse->getFileInfo()->fileType_; 
-    if(fileType == "js"){
-        ContentType += httpContentTypes["js"];
+void HttpResponse::sendResponseHeader(TcpClient* client){
+    if(!respData_.empty()){
+        responseHead_->responseHeader_ += respData_;
     }
-    else{
-        ContentType += (httpContentTypes[fileType] + fileType);
-    }
-    addHeader(ContentType);
-
-    httpParse->getFileInfo()->fileSize_= httpParse->getFileInfo()->fileStat_.st_size;
-    string ContentLength = "Content-Length:" + to_string(httpParse->getFileInfo()->fileSize_);
-    addHeader(ContentLength);
-
-    // æœ€åŽåŠ äº†ä¸€ä¸ªç»“å°¾
-    addHeader("");
+    LOG_INFO("send response http header:%s",responseHead_->responseHeader_.c_str());
+    client->send(responseHead_->responseHeader_);
 }
 
 
-void HttpResponse::addHeader(const string& head)
-{   
+void HttpResponse::SendFile(TcpClient *client, std::unique_ptr<HttpInfo> &httpInfo) {
+    // Èç¹û»¹Ã»ÓÐÍê³É½âÎö£¬¾Í²»·¢ËÍresponseÇëÇó£¬¼ÌÐøµÈ´ýÏûÏ¢¡£
+    if (!httpInfo->isParseFinish())return;
+    auto &header = httpInfo->parse_->getHeader();
+    if (header->method_ == "POST") {
+        //POSTÏÈÖ´ÐÐ»Øµ÷º¯ÊýÔÚÀ´·¢ËÍÊý¾Ý£¬×¢ÒâÂß¼­Ë³Ðò
+        auto cb = HttpCallback::getPostCB();
+        cb(header->requestURI, header->bodyData_);
+    }
+    // ÉèÖÃÌí¼ÓÏìÓ¦Í·ÎÄ¼þ
+    setHeaderResponse(header.get());
+
+    // ·¢ËÍÍ·ÎÄ¼þ
+    sendResponseHeader(client);
+
+    auto& reqFileInfo = header->reqFileInfo_;
+    client->start = system_clock::now();
+    char *buff = (char *) malloc(reqFileInfo->fileSize_);
+    int n = ::read(reqFileInfo->fileFd_, buff, reqFileInfo->fileSize_);
+    // LOG_INFO("read buff:%d",n);
+    string s(buff, reqFileInfo->fileSize_); // ÐÔÄÜ»áËðÊ§£¬µ«ÊÇ²»ÐèÒªÅÐ¶Ï¶þ½øÖÆÁË
+    // auto end = system_clock::now();
+    // auto duration = duration_cast<microseconds>(end - client->start);
+    // cout <<  "¶ÁÈ¡ÎÄ¼þ»¨·ÑÁË"
+    // << double(duration.count()) * microseconds::period::num / microseconds::period::den
+    // << "Ãë" << endl;
+    client->send(std::move(s));
+    free(buff);
+
+    // ·¢ËÍÍêÎÄ¼þ¹Ø±ÕÌ×½Ó×Ö
+    close(reqFileInfo->fileFd_);
+    if (header->kv_.find("Connection") == header->kv_.end() || header->kv_["Connection"] == "close") {
+        client->CloseCallback(); // ²»ÊÇ³¤Á¬½ÓÐèÒª¹Ø±Õ
+    }
+}
+
+
+
+void HttpResponse::addHttpResponseHead(string k, string v) {
+    responseHead_->responseHeader_ += k + ":" + v;
+    addHeaderEnd();
+}
+
+void HttpResponse::setRespData(std::string &data) {
+    respData_ += data;
+}
+
+void HttpResponse::addHeaderEnd() {
     string s = "\r\n";
-    if (!head.empty())
-    {   
-        s = head + "\r\n";
-    }
-    this->addHttpResponseHead(s);
+    responseHead_->responseHeader_ += s;
 }
 
-HttpResponse::~HttpResponse(){}
+// todo: Ìí¼ÓpostÏìÓ¦Í·ÎÄ¼þ
+bool setPostHeaderResponse(Header *header) {
+
+}
+
+void HttpResponse::setConnection(Header *header) {
+    // ÅÐ¶ÏÊÇ·ñÌí¼Ókeep-alive
+    if (header->kv_.find("Connection") != header->kv_.end() && header->kv_["Connection"] != "close"
+        && header->code_ != HTTP_STATUS_CODE::NOT_FOUND) {
+        addHttpResponseHead("Connection", "keep-alive");
+    }
+}
+
+void HttpResponse::setContentLength(Header *header) {
+    string key = "Content-Length";
+    string value = "";
+    if (header->method_ == "GET") {
+        value = to_string(header->reqFileInfo_->fileSize_);
+    } else if (header->method_ == "POST") {
+        value = to_string(respData_.size());
+    }
+    addHttpResponseHead(key, value);
+}
+
+void HttpResponse::setContentType(Header *header) {
+    string key = "Content-Type";
+    string value = "";
+    if (header->method_ == "GET") {
+        value = httpContentTypes[header->reqFileInfo_->fileType_];// Ã»ÓÐµÄÎÄ¼þÒ²²»»á×ßµ½ÕâÒ»²½µÄ
+    } else if (header->method_ == "POST") {
+        value = httpContentTypes["json"];
+    }
+    value += "; charset=utf-8"; // ÉèÖÃutf-8ÀàÐÍ
+    addHttpResponseHead(key, value);
+}
+
+void HttpResponse::setHeaderResponse(Header *header) {
+    // ³õÊ¼»¯
+    initHttpResponseHead(header->code_);
+    // ÊÇ·ñ³¤Á¬½Ó
+    setConnection(header);
+    // »Ø¸´µÄ³¤¶È
+    setContentLength(header);
+    //»Ø¸´µÄÀàÐÍ
+    setContentType(header);
+
+    // ×îºó¼ÓÒ»¸ö½áÎ²
+    addHeaderEnd();
+}
+
+HttpResponse::~HttpResponse() {}

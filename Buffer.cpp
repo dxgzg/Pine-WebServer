@@ -29,7 +29,7 @@ void Buffer::addCapacity(int len){
 
 int Buffer::recvMsg(int fd){
     int N = 65535;
-    char extrBuff[65535];
+    char extrBuff[N];
     
     // char* extrBuff = new char[N];
     struct iovec vec[2];

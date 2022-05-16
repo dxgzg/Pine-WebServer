@@ -37,7 +37,8 @@ EventLoopThreadPool::~EventLoopThreadPool(){
 
 void EventLoopThreadPool::createEventLoop(){
     EventLoopThreadPtr ptr = std::make_unique<EventLoopThread>();// 这样也能造一个loop出来
-    EventLoop* loop = ptr->getLoop(); 
+    EventLoop* loop = ptr->getLoop();
+    std::unique_lock<std::mutex> lock(mutex_);
     eventLoopPtrPool_.emplace_back(std::move(ptr));
     loop->loop();
 }

@@ -8,10 +8,11 @@
 #include "const.h"
 
 class TcpClient;
-class ResponseHead;
+struct ResponseHead;
 struct RequestFileInfo;
 struct HttpParse;
 class HttpInfo;
+class Header;
 
 // 同时也负责数据的写入
 
@@ -19,22 +20,41 @@ class HttpResponse
 {
 private:
     // 将新来的留言写入
-    void writeNewMsgToFile(rapidjson::Document& dom);
+//    void writeNewMsgToFile(rapidjson::Document& dom);
+
+
 public:
     HttpResponse();
     ~HttpResponse();
 
-    void SendFile(TcpClient* t,bool isRequestOk,std::unique_ptr<HttpInfo>&);
+    void SendFile(TcpClient* t,std::unique_ptr<HttpInfo>&);
 
-    void initHttpResponseHead(HTTP_STATUS_CODE);
-    void addHttpResponseHead(const std::string& head);
-    // 把一些头文件的信息都加进来，只有成功的时候调用这个函数,
-    // 并返回文件中的数据
-    void processHead(std::unique_ptr<HttpParse>& content);
-    void addHeader(const std::string& head);
     void reset();
+    // 设置回复的字段，给业务逻辑代码调用的
+    void setRespData(std::string& );
+
 private:
+    // todo post error的默认文件
+    // 初始化头文件
+    void initHttpResponseHead(HTTP_STATUS_CODE);
+    // 添加\r\n
+    void addHeaderEnd();
+    // 设置keep-alive
+    void setConnection(Header* header);
+    // 设置Content-Length todo 未来要改成多态
+    void setContentLength(Header* header);
+    // 设置Content-Type todo 未来要改成多态
+    void setContentType(Header* header);
+
+    // 设置响应头文件
+    void setHeaderResponse(Header* header);
+    // 添加响应k-v
+    void addHttpResponseHead(std::string k,std::string v);
+    // 发送头文件
+    void sendResponseHeader(TcpClient* client);
 private:
     std::unique_ptr<ResponseHead> responseHead_;
+    std::string respData_;
+
 };
 

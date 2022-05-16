@@ -1,11 +1,15 @@
 #pragma once
 #include <memory>
 #include <string>
+#if 1
+    #include <chrono>
+    
+#endif
 
 #include "Channel.h"
 #include "TcpClientCallback.h"
 #include "Socket.h"
-#include "const.h"
+
 
 class Buffer;
 class EventLoop;
@@ -42,13 +46,7 @@ public:
     int sendInLoop(std::string&);
     int getState()const{return (int)state_;}
     std::unique_ptr<HttpInfo>& getHttpInfo(){return httpInfo_;}
-    std::unique_ptr<HttpInfo>& resetHttpInfo();
-
-    void setParseStatus(PARSE_STATUS);
-    PARSE_STATUS getParseStatus()noexcept{return status_;}
-
-    void setHttpStatusCode(HTTP_STATUS_CODE code){code_ = code;}
-    HTTP_STATUS_CODE getHttpStatusCode()noexcept{return code_;}
+//    std::unique_ptr<HttpInfo>& resetHttpInfo();
 
     void readOk(int len);
 private:
@@ -62,6 +60,10 @@ private:
     STATE state_;
     std::function<void(int)> heartConnectCloseCallback_;
     std::unique_ptr<HttpInfo> httpInfo_;
-    PARSE_STATUS status_;
-    HTTP_STATUS_CODE code_;
+
+    // todo 待修改
+    #if 1
+    public:
+        std::chrono::time_point<std::chrono::system_clock> start;
+    #endif
 };

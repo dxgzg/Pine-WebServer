@@ -12,23 +12,18 @@
 DEFINE_int32(threadNum,4, "set thread num");
 
 using namespace std;
-
+ 
 void HttpServer::ReadCallback(Pine::clientPtr client,Buffer* inputBuffer){
     string str = inputBuffer->getAllString();
     LOG_INFO("%s",str.c_str());
-    unique_ptr<HttpInfo>& httpInfo = client->resetHttpInfo();
+    unique_ptr<HttpInfo>& httpInfo = client->getHttpInfo();
+    httpInfo->reset();
 
-    httpInfo->request_->analyseFile(client.get(),str,httpInfo,postCallback_);
+    httpInfo->request_->analyseFile(str,httpInfo);
 
-    if(client->getParseStatus() == PARSE_STATUS::PARSE_CONTINUE){
-        return ;
-    }
+    // 设置response头文件并且发送请求的文件
+    httpInfo->response_->SendFile(client.get(),httpInfo);
 
-    // 解析请求的内容 
-    bool flag = httpInfo->request_->request(client.get(),httpInfo);
-
-    // 发送请求的文件
-    httpInfo->response_->SendFile(client.get(),flag,httpInfo);    
 }
 
 void HttpServer::run(){

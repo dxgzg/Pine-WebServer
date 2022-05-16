@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include <thread>
+#include <mutex>
 #include "EventLoopThread.h"
 class EventLoopThread;
 class EventLoop;
@@ -23,4 +24,6 @@ private:
     std::vector<std::thread> threadPool_;
     size_t next_ = 0;
     int thread_num_ = 2;
+
+    std::mutex mutex_;
 };

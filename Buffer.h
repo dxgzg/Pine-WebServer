@@ -7,7 +7,7 @@ class Buffer
 {
 private:
     constexpr static int head = 8;
-    constexpr static int InitSize = 1024;
+    constexpr static int InitSize = 1024 * 50;
 private:
     int readIndex_;
     int writeIndex_;
@@ -64,7 +64,7 @@ public:
 
     std::string getAllString(){
         std::string s(startReadIndex(),readAble());// 后面表示拼接字符串的长度
-        // retrieve(s.size());
+        retrieve(s.size());
         // return std::move(s);// char*自动转字符串了
         return s;
     }

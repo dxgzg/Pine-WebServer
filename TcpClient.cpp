@@ -5,6 +5,12 @@
 #include "HeartConnect.h"
 #include "HttpParse.h"
 
+#if 1
+    #include <chrono>
+    #include <iostream>
+    using namespace std::chrono;
+#endif
+
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -23,9 +29,7 @@ TcpClient::TcpClient(EventLoop* loop,int clientFd)
             inputBuffer_(make_unique<Buffer>()),
             outputBuffer_(make_unique<Buffer>()),
             state_(STATE::CONNECT),
-            httpInfo_(make_unique<HttpInfo>()),
-            status_(PARSE_STATUS::PARSE_NONE),
-            code_(HTTP_STATUS_CODE::NONE)
+            httpInfo_(make_unique<HttpInfo>())
 {
     channel_->setReadCallback(std::bind(&TcpClient::ReadCallback,this));// 这是默认的，客户端也可以再次调用
     channel_->setCloseCallback(std::bind(&TcpClient::CloseCallback,this));
@@ -51,6 +55,9 @@ void TcpClient::registerClient(){
 }
 
 void TcpClient::CloseCallback(){
+    if(this == nullptr || channel_ == nullptr || channel_->getIndex() == DELETE ){
+        return ;
+    }
     LOG_INFO("fd:%d close callback",clientFd_->getFd());
     if(heartConnectCloseCallback_){
         heartConnectCloseCallback_(clientFd_->getFd());
@@ -103,24 +110,30 @@ int TcpClient::sendInLoop(std::string& msg){
         LOG_INFO("客户已经断开连接了");
         return 0;
     }
+
     size_t n = outputBuffer_->send(clientFd_->getFd(),msg);
     LOG_INFO("send msg n:%d",n);
     if(n == UINT64_MAX){
         state_ = STATE::DISCONNECT;
-        this->setParseStatus(PARSE_STATUS::PARSE_OK);
+
         LOG_INFO("send error");
         CloseCallback();
         return -1;
     }
+
     auto headDet = loop_->getHeartConnect();
     headDet->add(clientFd_->getFd(),shared_from_this(),std::bind(&TcpClient::CloseCallback,this));
+
     if(msg.size() > n){
-        this->setParseStatus(PARSE_STATUS::PARSE_CONTINUE);// 还需要继续发送
         string s = msg.substr(n);
+
         outputBuffer_->addMessage(const_cast<char*>(s.c_str()),s.size());
         channel_->enableWriteEvent();
+    } else{
+        channel_->disableWriteEvent();
     }
-    this->setParseStatus(PARSE_STATUS::PARSE_OK);
+
+    
     return n;
 }
 
@@ -136,41 +149,47 @@ int TcpClient::send(std::string msg){
 
 void TcpClient::sendExtra(){
     if(getState() == (int)(STATE::DISCONNECT))return ;
-    LOG_INFO("send extra");
+    // LOG_INFO("send extra");
     // channel可写事件的回调函数。
     string msg = outputBuffer_->getAllString();
-    outputBuffer_->retrieve(msg.size());
+    
     size_t n = outputBuffer_->send(clientFd_->getFd(),msg);
-    auto headDet = loop_->getHeartConnect();
-    headDet->add(clientFd_->getFd(),shared_from_this(),std::bind(&TcpClient::CloseCallback,this));
+    
     if(n == UINT64_MAX){
         state_ = STATE::DISCONNECT;
-        this->setParseStatus(PARSE_STATUS::PARSE_OK);
         CloseCallback();
         return ;
     }
+    outputBuffer_->retrieve(n);
+
     if(n == msg.size() && outputBuffer_->readAble() == 0){
-        this->setParseStatus(PARSE_STATUS::PARSE_OK);
+        auto headDet = loop_->getHeartConnect();
+        headDet->add(clientFd_->getFd(),shared_from_this(),std::bind(&TcpClient::CloseCallback,this));
         channel_->disableWriteEvent();
+
+        auto end = system_clock::now();
+        auto duration = duration_cast<microseconds>(end - start);
+        cout <<  "花费了" 
+        << double(duration.count()) * microseconds::period::num / microseconds::period::den 
+        << "秒" << endl;
     }
     else{
-        this->setParseStatus(PARSE_STATUS::PARSE_CONTINUE);
         string s = msg.substr(n);
         outputBuffer_->addMessage(const_cast<char*>(s.c_str()),s.size());
     }
 }
 
-std::unique_ptr<HttpInfo>& TcpClient::resetHttpInfo(){
-    // httpInfo_ = make_unique<HttpInfo>();
-    // if(status_ == PARSE_STATUS::PARSE_OK){
-        httpInfo_->reset();
-    // }
-    return httpInfo_;
-}
-
-void TcpClient::setParseStatus(PARSE_STATUS s){
-    status_ = s;
-}
+//std::unique_ptr<HttpInfo>& TcpClient::resetHttpInfo(){
+//    // httpInfo_ = make_unique<HttpInfo>();
+//     if(status_ == PARSE_STATUS::PARSE_OK){
+//        httpInfo_->reset();
+//     }
+//    return httpInfo_;
+//}
+//
+//void TcpClient::setParseStatus(PARSE_STATUS s){
+//    status_ = s;
+//}
 
 void TcpClient::readOk(int len){
     inputBuffer_->retrieve(len);

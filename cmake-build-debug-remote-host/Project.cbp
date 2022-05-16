@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="Project"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/dxgzg/Pine/cmake-build-debug-remote-host"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j6 -f &quot;/home/dxgzg/Pine/cmake-build-debug-remote-host/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j6 -f &quot;/home/dxgzg/Pine/cmake-build-debug-remote-host/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j6 -f &quot;/home/dxgzg/Pine/cmake-build-debug-remote-host/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j6 -f &quot;/home/dxgzg/Pine/cmake-build-debug-remote-host/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/dxgzg/Pine/cmake-build-debug-remote-host"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j6 -f &quot;/home/dxgzg/Pine/cmake-build-debug-remote-host/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j6 -f &quot;/home/dxgzg/Pine/cmake-build-debug-remote-host/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j6 -f &quot;/home/dxgzg/Pine/cmake-build-debug-remote-host/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j6 -f &quot;/home/dxgzg/Pine/cmake-build-debug-remote-host/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/dxgzg/Pine/cmake-build-debug-remote-host"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j6 -f &quot;/home/dxgzg/Pine/cmake-build-debug-remote-host/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j6 -f &quot;/home/dxgzg/Pine/cmake-build-debug-remote-host/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j6 -f &quot;/home/dxgzg/Pine/cmake-build-debug-remote-host/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j6 -f &quot;/home/dxgzg/Pine/cmake-build-debug-remote-host/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Pine">
+				<Option output="/home/dxgzg/Pine/cmake-build-debug-remote-host/Pine" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir=""/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/dxgzg/Pine/."/>
+					<Add directory="/home/dxgzg/Pine/rapidjson"/>
+					<Add directory="/home/dxgzg/Pine/./Http"/>
+					<Add directory="/usr/local/lib/gcc/x86_64-pc-linux-gnu/11.1.0/../../../../include/c++/11.1.0"/>
+					<Add directory="/usr/local/lib/gcc/x86_64-pc-linux-gnu/11.1.0/../../../../include/c++/11.1.0/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/local/lib/gcc/x86_64-pc-linux-gnu/11.1.0/../../../../include/c++/11.1.0/backward"/>
+					<Add directory="/usr/local/lib/gcc/x86_64-pc-linux-gnu/11.1.0/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/local/lib/gcc/x86_64-pc-linux-gnu/11.1.0/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j6 -f &quot;/home/dxgzg/Pine/cmake-build-debug-remote-host/Makefile&quot;  VERBOSE=1 Pine"/>
+					<CompileFile command="/usr/bin/make -j6 -f &quot;/home/dxgzg/Pine/cmake-build-debug-remote-host/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j6 -f &quot;/home/dxgzg/Pine/cmake-build-debug-remote-host/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j6 -f &quot;/home/dxgzg/Pine/cmake-build-debug-remote-host/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Pine/fast">
+				<Option output="/home/dxgzg/Pine/cmake-build-debug-remote-host/Pine" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir=""/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/dxgzg/Pine/."/>
+					<Add directory="/home/dxgzg/Pine/rapidjson"/>
+					<Add directory="/home/dxgzg/Pine/./Http"/>
+					<Add directory="/usr/local/lib/gcc/x86_64-pc-linux-gnu/11.1.0/../../../../include/c++/11.1.0"/>
+					<Add directory="/usr/local/lib/gcc/x86_64-pc-linux-gnu/11.1.0/../../../../include/c++/11.1.0/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/local/lib/gcc/x86_64-pc-linux-gnu/11.1.0/../../../../include/c++/11.1.0/backward"/>
+					<Add directory="/usr/local/lib/gcc/x86_64-pc-linux-gnu/11.1.0/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/local/lib/gcc/x86_64-pc-linux-gnu/11.1.0/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j6 -f &quot;/home/dxgzg/Pine/cmake-build-debug-remote-host/Makefile&quot;  VERBOSE=1 Pine/fast"/>
+					<CompileFile command="/usr/bin/make -j6 -f &quot;/home/dxgzg/Pine/cmake-build-debug-remote-host/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j6 -f &quot;/home/dxgzg/Pine/cmake-build-debug-remote-host/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j6 -f &quot;/home/dxgzg/Pine/cmake-build-debug-remote-host/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/dxgzg/Pine/Acceptor.cpp">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Acceptor.h">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Buffer.cpp">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Buffer.h">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Channel.cpp">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Channel.h">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Epoller.cpp">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Epoller.h">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/EventLoop.cpp">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/EventLoop.h">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/EventLoopThread.cpp">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/EventLoopThread.h">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/EventLoopThreadPool.cpp">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/EventLoopThreadPool.h">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/HeartConnect.cpp">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/HeartConnect.h">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Http/Header.cpp">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Http/Header.h">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Http/HttpCallback.cpp">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Http/HttpCallback.h">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Http/HttpParse.cpp">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Http/HttpParse.h">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Http/HttpRequest.cpp">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Http/HttpRequest.h">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Http/HttpResponse.cpp">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Http/HttpResponse.h">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Http/HttpServer.cpp">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Http/HttpServer.h">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Http/cookie.cpp">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Http/cookie.h">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/InetAddr.cpp">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/InetAddr.h">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Logger.cpp">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Logger.h">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Poller.cpp">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Poller.h">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Socket.cpp">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Socket.h">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/TcpClient.cpp">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/TcpClient.h">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/TcpServer.cpp">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/TcpServer.h">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Thread.cpp">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/Thread.h">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/TimeStamp.cpp">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/TimeStamp.h">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/main.cpp">
+			<Option target="Pine"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/dxgzg/Pine/utils.cmake">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
