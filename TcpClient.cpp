@@ -133,11 +133,9 @@ int TcpClient::sendInLoop(std::string& msg){
         string s = msg.substr(n);
         outputBuffer_->addMessage(const_cast<char*>(s.c_str()),s.size());
         channel_->enableWriteEvent();
+        state_ = CLIENT_STATUS::SEND_CONTINUE; // 设置有消息发送状态
     } else{
         channel_->disableWriteEvent();
-        if(state_ == CLIENT_STATUS::WAIT_DISCONNECT){
-            CloseCallback();
-        }
     }
 
     
@@ -180,7 +178,10 @@ void TcpClient::sendExtra(){
         << double(duration.count()) * microseconds::period::num / microseconds::period::den 
         << "秒" << endl;
 
-
+        // 如果是等待关闭状态，关掉这个连接
+        if(state_ == CLIENT_STATUS::WAIT_DISCONNECT){
+            CloseCallback();
+        }
     }
     else{
         string s = msg.substr(n);
