@@ -9,15 +9,13 @@
 #include "Channel.h"
 #include "TcpClientCallback.h"
 #include "Socket.h"
+#include "const.h"
 
 
 class Buffer;
 class EventLoop;
 class HttpInfo;
-enum class STATE{
-    CONNECT = 0,
-    DISCONNECT = 1
-};
+
 class TcpClient : public std::enable_shared_from_this<TcpClient>{
 private:
     using closeFun = std::function<void(Pine::clientPtr&)>;
@@ -57,7 +55,7 @@ private:
     closeFun closeCallback_;
     std::unique_ptr<Buffer> inputBuffer_;
     std::unique_ptr<Buffer> outputBuffer_;
-    STATE state_;
+    CLIENT_STATUS state_;
     std::function<void(int)> heartConnectCloseCallback_;
     std::unique_ptr<HttpInfo> httpInfo_;
 
@@ -67,3 +65,4 @@ private:
         std::chrono::time_point<std::chrono::system_clock> start;
     #endif
 };
+//todo 完善客户端的状态机

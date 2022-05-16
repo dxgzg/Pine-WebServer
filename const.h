@@ -24,6 +24,14 @@ enum class HTTP_STATUS_CODE{
     OK = 200,
     NOT_FOUND = 404,
 };
+
+enum class CLIENT_STATUS{
+    NONE = 0,
+    CONNECT,
+    SEND_CONTINUE,
+    DISCONNECT,
+    WAIT_DISCONNECT
+};
 // std::map<std::string,std::string> httpContentTypes = {
 //     {"js","application/x-javascript"},
 //     {"css","text/"},

@@ -28,7 +28,7 @@ TcpClient::TcpClient(EventLoop* loop,int clientFd)
             loop_(loop),
             inputBuffer_(make_unique<Buffer>()),
             outputBuffer_(make_unique<Buffer>()),
-            state_(STATE::CONNECT),
+            state_(CLIENT_STATUS::NONE),
             httpInfo_(make_unique<HttpInfo>())
 {
     channel_->setReadCallback(std::bind(&TcpClient::ReadCallback,this));// 这是默认的，客户端也可以再次调用
@@ -50,20 +50,25 @@ void TcpClient::registerClient(){
 
     std::function<void()> callback = std::bind(&TcpClient::CloseCallback,this);
     heartConnect->add(getFd(),shared_from_this(),callback);
-
+    this->state_ = CLIENT_STATUS::CONNECT;
     channel_->enableReadEvent();
 }
 
 void TcpClient::CloseCallback(){
-    if(this == nullptr || channel_ == nullptr || channel_->getIndex() == DELETE ){
+    assert(state_ !=  CLIENT_STATUS::DISCONNECT );
+    if(state_ == CLIENT_STATUS::SEND_CONTINUE ){
+        state_ = CLIENT_STATUS::WAIT_DISCONNECT;
         return ;
     }
+
     LOG_INFO("fd:%d close callback",clientFd_->getFd());
     if(heartConnectCloseCallback_){
         heartConnectCloseCallback_(clientFd_->getFd());
     }
+
     channel_->setIndex(DELETE);// 准备删除操作。
     channel_->disableAll();
+    state_ = CLIENT_STATUS::DISCONNECT;
     auto ptr = shared_from_this();
     closeCallback_(ptr); // 这个是必定存在的
 }
@@ -77,7 +82,7 @@ void TcpClient::ReadCallback(){
             if(n == -1){
                 LOG_ERROR("recv error");
             }
-            state_ = STATE::DISCONNECT;
+//            state_ = STATE::DISCONNECT;
             CloseCallback();
             return ;
         }
@@ -106,7 +111,7 @@ void TcpClient::ReadCallback(){
 // 线程安全的
 int TcpClient::sendInLoop(std::string& msg){
     assert(isSameThread(loop_->getThreadId()));
-    if(getState() == (int)STATE::DISCONNECT){
+    if(state_ == CLIENT_STATUS::DISCONNECT){
         LOG_INFO("客户已经断开连接了");
         return 0;
     }
@@ -114,9 +119,9 @@ int TcpClient::sendInLoop(std::string& msg){
     size_t n = outputBuffer_->send(clientFd_->getFd(),msg);
     LOG_INFO("send msg n:%d",n);
     if(n == UINT64_MAX){
-        state_ = STATE::DISCONNECT;
+        state_ = CLIENT_STATUS::DISCONNECT;
 
-        LOG_INFO("send error");
+        LOG_ERROR("send error");
         CloseCallback();
         return -1;
     }
@@ -126,11 +131,13 @@ int TcpClient::sendInLoop(std::string& msg){
 
     if(msg.size() > n){
         string s = msg.substr(n);
-
         outputBuffer_->addMessage(const_cast<char*>(s.c_str()),s.size());
         channel_->enableWriteEvent();
     } else{
         channel_->disableWriteEvent();
+        if(state_ == CLIENT_STATUS::WAIT_DISCONNECT){
+            CloseCallback();
+        }
     }
 
     
@@ -148,7 +155,7 @@ int TcpClient::send(std::string msg){
 }
 
 void TcpClient::sendExtra(){
-    if(getState() == (int)(STATE::DISCONNECT))return ;
+    if(state_ == CLIENT_STATUS::DISCONNECT)return ;
     // LOG_INFO("send extra");
     // channel可写事件的回调函数。
     string msg = outputBuffer_->getAllString();
@@ -156,7 +163,7 @@ void TcpClient::sendExtra(){
     size_t n = outputBuffer_->send(clientFd_->getFd(),msg);
     
     if(n == UINT64_MAX){
-        state_ = STATE::DISCONNECT;
+        state_ = CLIENT_STATUS::DISCONNECT;
         CloseCallback();
         return ;
     }
@@ -172,6 +179,8 @@ void TcpClient::sendExtra(){
         cout <<  "花费了" 
         << double(duration.count()) * microseconds::period::num / microseconds::period::den 
         << "秒" << endl;
+
+
     }
     else{
         string s = msg.substr(n);
