@@ -85,12 +85,13 @@ void HttpResponse::SendFile(TcpClient *client, std::unique_ptr<HttpInfo> &httpIn
     // cout <<  "读取文件花费了"
     // << double(duration.count()) * microseconds::period::num / microseconds::period::den
     // << "秒" << endl;
-    client->send(std::move(s));
+    int n = client->send(std::move(s));
     free(buff);
-
     // 发送完文件关闭套接字
     close(reqFileInfo->fileFd_);
-    if (header->kv_.find("Connection") == header->kv_.end() || header->kv_["Connection"].find("close") != string::npos) {
+
+    // 发送失败已经会调用closeCallback了
+    if (n == -1 || (header->kv_.find("Connection") == header->kv_.end() && header->kv_["Connection"].find("close") != string::npos)) {
         client->CloseCallback(); // 不是长连接需要关闭
     }
 }

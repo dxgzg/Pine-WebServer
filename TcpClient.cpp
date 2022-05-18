@@ -120,10 +120,9 @@ int TcpClient::sendInLoop(std::string& msg){
     size_t n = outputBuffer_->send(clientFd_->getFd(),msg);
     LOG_INFO("send msg n:%zu",n);
     if(n == UINT64_MAX){
-        state_ = CLIENT_STATUS::DISCONNECT;
-
         LOG_ERROR("send error");
-        CloseCallback();
+        // responst 调用关闭函数
+//        CloseCallback();
         return -1;
     }
 
@@ -145,13 +144,7 @@ int TcpClient::sendInLoop(std::string& msg){
 }
 
 int TcpClient::send(std::string msg){
-
     return sendInLoop(msg);
-
-//    else{
-//        loop_->queueInLoop(std::bind(&TcpClient::sendInLoop,this,std::ref(msg)));
-//    }
-
 }
 
 void TcpClient::sendExtra(){
@@ -163,7 +156,6 @@ void TcpClient::sendExtra(){
     size_t n = outputBuffer_->send(clientFd_->getFd(),msg);
     
     if(n == UINT64_MAX){
-        state_ = CLIENT_STATUS::DISCONNECT;
         CloseCallback();
         return ;
     }
