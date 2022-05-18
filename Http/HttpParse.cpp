@@ -3,13 +3,12 @@
 #include "HttpResponse.h"
 #include "const.h"
 #include "Logger.h"
-#include "TimeStamp.h"
-#include "Header.h"
-#include "random.h"
 
-#include <regex>
+#include "Header.h"
+
+
 #include <gflags/gflags.h>
-#include <sys/types.h>
+
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unordered_set>
@@ -167,7 +166,7 @@ bool HttpParse::analyseFile(const string& request){
         setParseOK();
     } else if(header_->status_ == PARSE_STATUS::PARSE_BODY_CONTINUE){
         // todo 这里可能会遇到>的情况，就是粘包，后期需要改善
-        int cLength = stoi(header_->kv_["Content-Length"]);
+        size_t cLength = stoi(header_->kv_["Content-Length"]);
         if(header_->bodyTmp_.size() + request.size() == cLength){
             setParseOK();
             header_->bodyData_ = move(header_->bodyTmp_) + move(request);
@@ -214,7 +213,7 @@ bool HttpParse::parseBody(const std::string& request,size_t lastLineIndex){
         size_t dataIndex = lastLineIndex + 4;
         string data = request.substr(dataIndex);
 
-        int cLength = stoi(it->second);
+        size_t cLength = stoi(it->second);
         if(cLength != data.size()){
             header_->bodyTmp_.reserve(cLength);
             header_->bodyTmp_ += std::move(data);
@@ -229,7 +228,7 @@ bool HttpParse::parseBody(const std::string& request,size_t lastLineIndex){
 
 bool HttpParse::parseMethod(std::string& method){
     for(auto& c :method){
-        toupper(c);
+        c = toupper(c);
     }
     if(METHOD.find(method) == METHOD.end())return false;
 
@@ -306,6 +305,7 @@ void HttpParse::reset(){
 void HttpResponse::reset(){
     responseHead_->responseHeader_ = "";
     respData_ = "";
+    cookie_ = "";
 }
 
 void HttpInfo::reset(){

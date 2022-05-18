@@ -5,16 +5,12 @@
 #include "TimeStamp.h"
 #include "HttpCallback.h"
 
-#include <sys/sendfile.h>
 #include <gflags/gflags.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 
 #if 1
 
 #include <chrono>
-#include <iostream>
+
 
 using namespace std::chrono;
 using namespace std;
@@ -42,7 +38,7 @@ void HttpResponse::initHttpResponseHead(HTTP_STATUS_CODE code) {
     addHttpResponseHead("Date", TimeStamp::getGMT());
 }
 
-HttpResponse::HttpResponse() : responseHead_(make_unique<ResponseHead>()), respData_("") {}
+HttpResponse::HttpResponse() : responseHead_(make_unique<ResponseHead>()), respData_(""),cookie_("") {}
 
 void HttpResponse::sendResponseHeader(TcpClient* client){
     if(!respData_.empty()){
@@ -52,6 +48,16 @@ void HttpResponse::sendResponseHeader(TcpClient* client){
     client->send(responseHead_->responseHeader_);
 }
 
+void HttpResponse::setCookie(const char* cookie,const char* path,int maxAge,bool httpOnly){
+    cookie_ += ";";
+    cookie_ +=  path;
+    cookie_ +=  ";";
+    cookie_ +=  to_string(maxAge);
+    if(httpOnly){
+        cookie_ += ";";
+        cookie_ += "HttpOnly";
+    }
+}
 
 void HttpResponse::SendFile(TcpClient *client, std::unique_ptr<HttpInfo> &httpInfo) {
     // 如果还没有完成解析，就不发送response请求，继续等待消息。
@@ -71,7 +77,7 @@ void HttpResponse::SendFile(TcpClient *client, std::unique_ptr<HttpInfo> &httpIn
     auto& reqFileInfo = header->reqFileInfo_;
     client->start = system_clock::now();
     char *buff = (char *) malloc(reqFileInfo->fileSize_);
-    int n = ::read(reqFileInfo->fileFd_, buff, reqFileInfo->fileSize_);
+    ::read(reqFileInfo->fileFd_, buff, reqFileInfo->fileSize_);
     // LOG_INFO("read buff:%d",n);
     string s(buff, reqFileInfo->fileSize_); // 性能会损失，但是不需要判断二进制了
     // auto end = system_clock::now();
@@ -84,7 +90,7 @@ void HttpResponse::SendFile(TcpClient *client, std::unique_ptr<HttpInfo> &httpIn
 
     // 发送完文件关闭套接字
     close(reqFileInfo->fileFd_);
-    if (header->kv_.find("Connection") == header->kv_.end() || header->kv_["Connection"] == "close") {
+    if (header->kv_.find("Connection") == header->kv_.end() || header->kv_["Connection"].find("close") != string::npos) {
         client->CloseCallback(); // 不是长连接需要关闭
     }
 }
@@ -107,7 +113,8 @@ void HttpResponse::addHeaderEnd() {
 
 void HttpResponse::setConnection(Header *header) {
     // 判断是否添加keep-alive
-    if (header->kv_.find("Connection") != header->kv_.end() && header->kv_["Connection"] != "close"
+    // todo 写个trim去掉多余的空格
+    if (header->kv_.find("Connection") != header->kv_.end() && header->kv_["Connection"].find("close") == string::npos
         && header->code_ != HTTP_STATUS_CODE::NOT_FOUND) {
         addHttpResponseHead("Connection", "keep-alive");
     }
@@ -137,6 +144,12 @@ void HttpResponse::setContentType(Header *header) {
     addHttpResponseHead(key, value);
 }
 
+void HttpResponse::setCookie(Header* header){
+    if(cookie_.empty())return ;
+    string k = "Set-Cookie";
+    addHttpResponseHead(k,cookie_);
+}
+
 void HttpResponse::setHeaderResponse(Header *header) {
     // 初始化
     initHttpResponseHead(header->code_);
@@ -146,7 +159,8 @@ void HttpResponse::setHeaderResponse(Header *header) {
     setContentLength(header);
     //回复的类型
     setContentType(header);
-
+    // 是否需要设置cookie
+    setCookie(header);
     // 最后加一个结尾
     addHeaderEnd();
 }

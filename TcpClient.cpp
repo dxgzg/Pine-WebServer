@@ -56,7 +56,8 @@ void TcpClient::registerClient(){
 
 void TcpClient::CloseCallback(){
     assert(state_ !=  CLIENT_STATUS::DISCONNECT );
-    if(state_ == CLIENT_STATUS::SEND_CONTINUE ){
+    // 后者是防止在发送消息的时候超时事件的发生
+    if(state_ == CLIENT_STATUS::SEND_CONTINUE || state_ == CLIENT_STATUS::WAIT_DISCONNECT){
         state_ = CLIENT_STATUS::WAIT_DISCONNECT;
         return ;
     }
@@ -117,7 +118,7 @@ int TcpClient::sendInLoop(std::string& msg){
     }
 
     size_t n = outputBuffer_->send(clientFd_->getFd(),msg);
-    LOG_INFO("send msg n:%d",n);
+    LOG_INFO("send msg n:%zu",n);
     if(n == UINT64_MAX){
         state_ = CLIENT_STATUS::DISCONNECT;
 
@@ -132,8 +133,9 @@ int TcpClient::sendInLoop(std::string& msg){
     if(msg.size() > n){
         string s = msg.substr(n);
         outputBuffer_->addMessage(const_cast<char*>(s.c_str()),s.size());
-        channel_->enableWriteEvent();
         state_ = CLIENT_STATUS::SEND_CONTINUE; // 设置有消息发送状态
+        channel_->enableWriteEvent();
+
     } else{
         channel_->disableWriteEvent();
     }
@@ -143,13 +145,13 @@ int TcpClient::sendInLoop(std::string& msg){
 }
 
 int TcpClient::send(std::string msg){
-    if(std::this_thread::get_id() == loop_->getThreadId()){
-        return sendInLoop(msg);
-    }
-    else{
-        loop_->queueInLoop(std::bind(&TcpClient::sendInLoop,this,std::ref(msg)));
-    }
-    return 0;
+
+    return sendInLoop(msg);
+
+//    else{
+//        loop_->queueInLoop(std::bind(&TcpClient::sendInLoop,this,std::ref(msg)));
+//    }
+
 }
 
 void TcpClient::sendExtra(){

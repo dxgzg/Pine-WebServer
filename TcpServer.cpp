@@ -30,6 +30,8 @@ TcpServer::TcpServer(EventLoop* loop,
 
 void TcpServer::accept(){
     int connfd = acceptor_->accept();
+    // accept error就不继续accept了
+    if(connfd == -1)return ;
     EventLoop* loop = threadPool_->getNextLoop();
     Pine::clientPtr t(new TcpClient(loop,connfd));
     LOG_INFO("main accept new connect");

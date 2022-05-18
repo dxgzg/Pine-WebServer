@@ -41,5 +41,7 @@ void EventLoopThreadPool::createEventLoop(){
     EventLoop* loop = ptr->getLoop();
     std::unique_lock<std::mutex> lock(mutex_);
     eventLoopPtrPool_.emplace_back(std::move(ptr));
+    // 不释放锁 raii会失效
+    lock.unlock();
     loop->loop();
 }

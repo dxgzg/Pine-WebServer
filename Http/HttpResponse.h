@@ -29,10 +29,13 @@ public:
 
     void SendFile(TcpClient* t,std::unique_ptr<HttpInfo>&);
 
+    // todo 换成智能指针resst
     void reset();
     // 设置回复的字段，给业务逻辑代码调用的
     void setRespData(std::string& );
 
+    // todo 设置cookie,给业务使用者调用; cookie ex:id=name
+    void setCookie(const char* cookie,const char* path,int maxAge,bool httpOnly= true);
 private:
     // todo post error的默认文件
     // 初始化头文件
@@ -50,11 +53,13 @@ private:
     void setHeaderResponse(Header* header);
     // 添加响应k-v
     void addHttpResponseHead(std::string k,std::string v);
+    // 设置cookie
+    void setCookie(Header* header);
     // 发送头文件
     void sendResponseHeader(TcpClient* client);
 private:
     std::unique_ptr<ResponseHead> responseHead_;
     std::string respData_;
-
+    std::string cookie_;
 };
 

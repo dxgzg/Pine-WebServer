@@ -7,7 +7,7 @@
 
 using namespace std;
 
-static int BUFFER_LEVEL = 1024 * 1024;
+static size_t BUFFER_LEVEL = 1024 * 1024;
 
 void Buffer::addCapacity(int len){
     // true 就可以开启挤牙膏模式
@@ -44,7 +44,7 @@ int Buffer::recvMsg(int fd){
     ssize_t n = ::readv(fd,vec,iovcnt);
 
 
-    LOG_INFO("io read bytes:%d",n);
+    LOG_INFO("io read bytes:%zd",n);
 
     if(n == -1)return -1;
     if(writable >= n){

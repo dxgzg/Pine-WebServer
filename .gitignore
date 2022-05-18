@@ -10,5 +10,8 @@ cmake-build-debug-remote-host/*
 cmake-build-debug/*
 .idea/*
 .vscode/*
-server.conf
 检查问题
+.clion.source.upload.marker
+1.txt
+erroPine
+

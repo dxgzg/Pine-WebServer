@@ -2,7 +2,8 @@
 
 #include <time.h>
 #include <string>
-
+#include <chrono>
+#include "Logger.h"
 
 class TimeStamp{ 
 public:
@@ -21,14 +22,13 @@ public:
         return buff;
     }
 	static std::string getGMT(){
-		time_t  now =time(0);
-		char  * data = ctime(&now);
-		tm  * gm =gmtime(&now);
-		data = asctime(gm);
-		std::string nowString = data;
-		nowString.pop_back(); // 去掉最后一个\n
-		nowString += " GMT";
-		return nowString;
+        auto now = std::chrono::system_clock::now();
+
+        std::time_t nowTime = std::chrono::system_clock::to_time_t(now);
+        tm* tm_time = localtime(&nowTime);
+        char buff[128] = { 0 };
+        strftime(buff,128,"%a,%d %b %Y %X UTC",tm_time);
+        return buff;
 	}
 private:
 };
