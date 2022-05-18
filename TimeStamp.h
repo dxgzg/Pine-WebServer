@@ -21,7 +21,7 @@ public:
 		);
         return buff;
     }
-	static std::string getGMT(){
+	static std::string getUTC(){
         auto now = std::chrono::system_clock::now();
 
         std::time_t nowTime = std::chrono::system_clock::to_time_t(now);

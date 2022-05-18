@@ -35,7 +35,7 @@ void HttpResponse::initHttpResponseHead(HTTP_STATUS_CODE code) {
     responseHead_->initHttpResponseHead(code);
 
     addHttpResponseHead("Server", FLAGS_serverName);
-    addHttpResponseHead("Date", TimeStamp::getGMT());
+    addHttpResponseHead("Date", TimeStamp::getUTC());
 }
 
 HttpResponse::HttpResponse() : responseHead_(make_unique<ResponseHead>()), respData_(""),cookie_("") {}
