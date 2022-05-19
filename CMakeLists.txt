@@ -10,17 +10,19 @@ SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
 include_directories(.)
 include_directories(rapidjson)
 include_directories(./Http)
+include_directories(./net/include)
 include (utils.cmake)
 # 防止__FILE__警告
 add_definitions(-Wno-builtin-macro-redefined)
 
 
 
-aux_source_directory(. SRC_LIST1)
-aux_source_directory(rapidjson SRC_LIST2)
-aux_source_directory(Http SRC_LIST3)
+aux_source_directory(. Main)
+aux_source_directory(rapidjson Rapidjson)
+aux_source_directory(Http Http)
+aux_source_directory(net/source NetSource)
 
-add_executable(Pine ${SRC_LIST1} ${SRC_LIST2} ${SRC_LIST3})
+add_executable(Pine ${Main} ${Rapidjson} ${Http} ${NetSource})
 #add_executable(Pine ${SRC_LIST1} ${SRC_LIST2} ${SRC_LIST3} Http/Header.h Http/HttpCallback.cpp Http/HttpCallback.h Http/Header.cpp)
 # 加一个动态链接库
 target_link_libraries(Pine pthread gflags)
