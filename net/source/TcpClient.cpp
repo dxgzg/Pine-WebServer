@@ -7,7 +7,6 @@
 
 #if 1
     #include <chrono>
-    #include <iostream>
     using namespace std::chrono;
 #endif
 
@@ -83,7 +82,7 @@ void TcpClient::ReadCallback(){
             if(n == -1){
                 LOG_ERROR("recv error");
             }
-//            state_ = STATE::DISCONNECT;
+            state_ = CLIENT_STATUS::SEND_ERROR;
             CloseCallback();
             return ;
         }
@@ -156,6 +155,7 @@ void TcpClient::sendExtra(){
     size_t n = outputBuffer_->send(clientFd_->getFd(),msg);
     
     if(n == UINT64_MAX){
+        state_ = CLIENT_STATUS::SEND_ERROR;
         CloseCallback();
         return ;
     }
@@ -166,14 +166,15 @@ void TcpClient::sendExtra(){
         headDet->add(clientFd_->getFd(),shared_from_this(),std::bind(&TcpClient::CloseCallback,this));
         channel_->disableWriteEvent();
 
-        auto end = system_clock::now();
-        auto duration = duration_cast<microseconds>(end - start);
-        cout <<  "花费了" 
-        << double(duration.count()) * microseconds::period::num / microseconds::period::den 
-        << "秒" << endl;
+//        auto end = system_clock::now();
+//        auto duration = duration_cast<microseconds>(end - start);
+//        cout <<  "花费了"
+//        << double(duration.count()) * microseconds::period::num / microseconds::period::den
+//        << "秒" << endl;
 
         // 如果是等待关闭状态，关掉这个连接
         if(state_ == CLIENT_STATUS::WAIT_DISCONNECT){
+            state_ = CLIENT_STATUS::SEND_OK;
             CloseCallback();
         }
     }

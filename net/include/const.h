@@ -29,6 +29,8 @@ enum class CLIENT_STATUS{
     NONE = 0,
     CONNECT,
     SEND_CONTINUE,
+    SEND_ERROR,
+    SEND_OK,
     DISCONNECT,
     WAIT_DISCONNECT
 };

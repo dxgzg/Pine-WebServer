@@ -23,7 +23,6 @@ void EventLoopThreadPool::start(){
 }
 EventLoop* EventLoopThreadPool::getNextLoop(){
     if(next_ >= eventLoopPtrPool_.size()){next_ = 0;}
-    // todo 为什么输出是1
     LOG_INFO("线程个数:%lu",eventLoopPtrPool_.size());
     if(eventLoopPtrPool_[next_]->getLoop() == nullptr){
         LOG_FATAL("O NO线程池出错了");
