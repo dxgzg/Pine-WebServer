@@ -91,7 +91,7 @@ void HttpResponse::SendFile(TcpClient *client, std::unique_ptr<HttpInfo> &httpIn
     close(reqFileInfo->fileFd_);
 
     // 发送失败已经会调用closeCallback了
-    if (n == -1 || (header->kv_.find("Connection") == header->kv_.end() && header->kv_["Connection"].find("close") != string::npos)) {
+    if (n == -1 || header->kv_.find("Connection") == header->kv_.end() || header->kv_["Connection"].find("close") != string::npos) {
         client->CloseCallback(); // 不是长连接需要关闭
     }
 }
