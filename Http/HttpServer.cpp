@@ -23,7 +23,6 @@ void HttpServer::ReadCallback(Pine::clientPtr client,Buffer* inputBuffer){
 
     // 设置response头文件并且发送请求的文件
     httpInfo->response_->SendFile(client.get(),httpInfo);
-
 }
 
 void HttpServer::run(){

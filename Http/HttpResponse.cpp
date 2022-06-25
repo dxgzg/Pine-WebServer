@@ -31,8 +31,8 @@ std::map<std::string, std::string> httpContentTypes = {
 };
 
 
-void HttpResponse::initHttpResponseHead(HTTP_STATUS_CODE code) {
-    responseHead_->initHttpResponseHead(code);
+void HttpResponse::initHttpResponseHead() {
+    // responseHead_->initHttpResponseHead(code);
 
     addHttpResponseHead("Server", FLAGS_serverName);
     addHttpResponseHead("Date", TimeStamp::getUTC());
@@ -44,8 +44,9 @@ void HttpResponse::sendResponseHeader(TcpClient* client){
     if(!respData_.empty()){
         responseHead_->responseHeader_ += respData_;
     }
-    LOG_INFO("send response http header:%s",responseHead_->responseHeader_.c_str());
-    client->send(responseHead_->responseHeader_);
+    responseHead_->responseStatue_ += responseHead_->responseHeader_;
+    LOG_INFO("send response http header:%s",responseHead_->responseStatue_.c_str());
+    client->send(responseHead_->responseStatue_);
 }
 
 void HttpResponse::setCookie(const char* cookie,const char* path,int maxAge,bool httpOnly){
@@ -65,8 +66,16 @@ void HttpResponse::SendFile(TcpClient *client, std::unique_ptr<HttpInfo> &httpIn
     auto &header = httpInfo->parse_->getHeader();
     if (header->method_ == "POST") {
         //POST先执行回调函数在来发送数据，注意逻辑顺序
-        auto cb = HttpCallback::getPostCB();
-        cb(header->requestURI, header->bodyData_);
+        auto cb = HttpCallback::getPostCB(header->requestURI.c_str());
+        if(cb == nullptr){
+            // todo 设置不存在的回调函数处理
+            LOG_ERROR("%s not callback fun",header->requestURI.c_str());
+        } else{
+            cb(httpInfo.get());
+        }
+    } else if(header->method_ == "GET"){
+        // GET先给个200
+        responseHead_->initHttpResponseHead(header->code_);
     }
     // 设置添加响应头文件
     setHeaderResponse(header.get());
@@ -103,7 +112,9 @@ void HttpResponse::addHttpResponseHead(string k, string v) {
     addHeaderEnd();
 }
 
-void HttpResponse::setRespData(std::string &data) {
+void HttpResponse::setResponseData(HTTP_STATUS_CODE code,std::string data) {
+    // get post 都需要这个
+    responseHead_->initHttpResponseHead(code);
     respData_ += data;
 }
 
@@ -124,6 +135,7 @@ void HttpResponse::setConnection(Header *header) {
 void HttpResponse::setContentLength(Header *header) {
     string key = "Content-Length";
     string value = "";
+    // todo 不太对劲，需要改一下。
     if (header->method_ == "GET") {
         value = to_string(header->reqFileInfo_->fileSize_);
     } else if (header->method_ == "POST") {
@@ -152,8 +164,8 @@ void HttpResponse::setCookie(Header* header){
 }
 
 void HttpResponse::setHeaderResponse(Header *header) {
-    // 初始化
-    initHttpResponseHead(header->code_);
+    // todo 响应状态应由用户提供初始化
+   initHttpResponseHead();
     // 是否长连接
     setConnection(header);
     // 回复的长度

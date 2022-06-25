@@ -35,10 +35,10 @@ public:
 
 struct ResponseHead{
     std::string responseHeader_;  // http头response
+    std::string responseStatue_;
     std::string serverName_; // 到时候改成flag
-    // TODO 还可以加个时间格式
-
 public:
+    ResponseHead() = default;
     void initHttpResponseHead(HTTP_STATUS_CODE code);
     ~ResponseHead();
 };
@@ -90,4 +90,6 @@ struct HttpInfo{
     ~HttpInfo();
     void reset();
     bool isParseFinish();
+    std::string getBodyData();
+    void setResponse(HTTP_STATUS_CODE,const char*);
 };

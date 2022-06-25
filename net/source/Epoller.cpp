@@ -11,6 +11,7 @@ void Epoller::poll(std::vector<Channel*>& artiveEvent){
     size_t num = ::epoll_wait(epollfd_,&(*artiveEvent_.begin()),artiveEvent_.size(),-1);
     if(num == UINT64_MAX){
         LOG_ERROR("epoll_wait errno %d",errno);
+        return ;
     }
     else if(num == 0){
         LOG_INFO("Time Out %s",__func__);
@@ -22,10 +23,6 @@ void Epoller::poll(std::vector<Channel*>& artiveEvent){
     // 找出活跃的事件
     for(size_t i=0;i < num ;++i){
         Channel* ptr = (Channel*)artiveEvent_[i].data.ptr;
-        if(ptr == nullptr){
-            LOG_ERROR("该客户已断开");
-            return ;
-        }
         // 把触发的事件也添加进去
         ptr->setCurEventState(artiveEvent_[i].events);
         artiveEvent.emplace_back(ptr);

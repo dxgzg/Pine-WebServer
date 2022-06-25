@@ -14,4 +14,5 @@ cmake-build-debug/*
 .clion.source.upload.marker
 1.txt
 erroPine
+cmake-build-pine/*
 

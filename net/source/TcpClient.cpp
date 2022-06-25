@@ -54,6 +54,7 @@ void TcpClient::registerClient(){
 }
 
 void TcpClient::CloseCallback(){
+    LOG_INFO("fd:%d close callback status:%d",clientFd_->getFd(), this->state_);
     assert(state_ !=  CLIENT_STATUS::DISCONNECT );
     // 后者是防止在发送消息的时候超时事件的发生
     if(state_ == CLIENT_STATUS::SEND_CONTINUE || state_ == CLIENT_STATUS::WAIT_DISCONNECT){
@@ -82,7 +83,7 @@ void TcpClient::ReadCallback(){
             if(n == -1){
                 LOG_ERROR("recv error");
             }
-            state_ = CLIENT_STATUS::SEND_ERROR;
+            state_ = CLIENT_STATUS::MUST_CLOSE_CONNECT;
             CloseCallback();
             return ;
         }
@@ -120,8 +121,6 @@ int TcpClient::sendInLoop(std::string& msg){
     LOG_INFO("send msg n:%zu",n);
     if(n == UINT64_MAX){
         LOG_ERROR("send error");
-        // responst 调用关闭函数
-//        CloseCallback();
         return -1;
     }
 
@@ -147,7 +146,11 @@ int TcpClient::send(std::string msg){
 }
 
 void TcpClient::sendExtra(){
-    if(state_ == CLIENT_STATUS::DISCONNECT)return ;
+    assert(isSameThread(loop_->getThreadId()));
+    if(state_ == CLIENT_STATUS::DISCONNECT){
+        LOG_INFO("客户已经断开连接了");
+        return ;
+    }
     // LOG_INFO("send extra");
     // channel可写事件的回调函数。
     string msg = outputBuffer_->getAllString();
@@ -155,8 +158,8 @@ void TcpClient::sendExtra(){
     size_t n = outputBuffer_->send(clientFd_->getFd(),msg);
     
     if(n == UINT64_MAX){
-        state_ = CLIENT_STATUS::SEND_ERROR;
-        CloseCallback();
+        LOG_INFO("send extra error");
+        channel_->disableWriteEvent();
         return ;
     }
     outputBuffer_->retrieve(n);
@@ -174,8 +177,10 @@ void TcpClient::sendExtra(){
 
         // 如果是等待关闭状态，关掉这个连接
         if(state_ == CLIENT_STATUS::WAIT_DISCONNECT){
-            state_ = CLIENT_STATUS::SEND_OK;
+            state_ = CLIENT_STATUS::CONNECT;
             CloseCallback();
+        } else{
+            state_ = CLIENT_STATUS::CONNECT;
         }
     }
     else{

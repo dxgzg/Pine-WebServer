@@ -18,7 +18,7 @@ class HttpInfo;
 
 class HttpServer{
 private:
-    using callback = std::function<bool(std::string,std::string)>;
+    using callback = std::function<void(HttpInfo*)>;
 private:
     EventLoop loop_;// 主loop
     TcpServer tcpServer_;
@@ -29,8 +29,8 @@ public:
     void ReadCallback(Pine::clientPtr t,Buffer* inputBuffer);
     void run();
     // todo 待修改
-    void setPostReadCallback(callback cb){
-        HttpCallback::setPostCB(cb);
+    void setPostReadCallback(const char* s,callback cb){
+        HttpCallback::setPostCB(s,cb);
     }
     ~HttpServer();
 
@@ -40,3 +40,4 @@ public:
 // todo gdb-server
 // todo g++报错
 // todo 压缩图片
+// todo GET、POST，加载静态资源。

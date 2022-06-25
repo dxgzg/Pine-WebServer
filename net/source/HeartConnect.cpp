@@ -1,8 +1,8 @@
 #include "HeartConnect.h"
 #include "Channel.h"
 #include "EventLoop.h"
-#include "HeartConnect.h"
 #include "Logger.h"
+#include "TcpClient.h"
 
 #include <sys/timerfd.h>
 #include <assert.h>
@@ -102,7 +102,9 @@ void HeartConnect::del(NodePtr ptr){
     assert(isSameThread(loop_->getThreadId()));
     LOG_INFO("timeout delete tcpClient");
     if(ptr->cPtr_.lock() != nullptr){
-        LOG_INFO("timeout call closeBack");
+        auto tmp = ptr->cPtr_.lock();
+        tmp->setState(CLIENT_STATUS::MUST_CLOSE_CONNECT);
+        LOG_INFO("timeout call closeBack %d",tmp->getFd());
         ptr->callback_();
     } else{
         destroyConnect(ptr); // callback会自动调用了，提前离开的需要自己调用

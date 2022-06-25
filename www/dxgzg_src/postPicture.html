@@ -44,6 +44,8 @@
     <link rel="stylesheet" href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css'>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://unpkg.com/axios@0.21.3/dist/axios.min.js"></script>
+     <script src="./js/vue.js"></script>
+     <script src="./js/vue-resource.js"></script>
 </head>
 
 <body>
@@ -89,18 +91,23 @@
                         that.imageUrl = e.target.result
 
                         console.log(that.imageUrl);
-                        let str = "addPicture"
-                        axios.post(str, {
-                            content: that.imageUrl,
+                        let checkPassword = "/checkPassword"
+                        let str = "/addPicture"
+                        axios.post(checkPassword, {
                             passKey: that.passKey
                                 // content: "hello"
                         }).then(function(response) {
-                            that.newMsg = ""
-                            console.log("send")
-                            alert("上传成功")
-                            window.location.href = './showMyAlbum.html'
+                            axios.post(str,{
+                                content: that.imageUrl
+                            }).then(function (response){
+                                that.newMsg = ""
+                                console.log("send")
+                                alert("上传成功")
+                                window.location.href = './showMyAlbum.html'
+                            })
                         }, function(err) {
-                            alert("error")
+                            alert("password invalid")
+                            window.location.href = './postPicture.html'
                             console.log(err);
                         });
                     }

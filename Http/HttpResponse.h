@@ -14,12 +14,10 @@ struct HttpParse;
 class HttpInfo;
 class Header;
 
-// 同时也负责数据的写入
-
 class HttpResponse
 {
 private:
-    // 将新来的留言写入
+
 //    void writeNewMsgToFile(rapidjson::Document& dom);
 
 
@@ -32,14 +30,15 @@ public:
     // todo 换成智能指针resst
     void reset();
     // 设置回复的字段，给业务逻辑代码调用的
-    void setRespData(std::string& );
+    void setResponseData(HTTP_STATUS_CODE,std::string);
 
     // todo 设置cookie,给业务使用者调用; cookie ex:id=name
     void setCookie(const char* cookie,const char* path,int maxAge,bool httpOnly= true);
+
 private:
     // todo post error的默认文件
     // 初始化头文件
-    void initHttpResponseHead(HTTP_STATUS_CODE);
+    void initHttpResponseHead();
     // 添加\r\n
     void addHeaderEnd();
     // 设置keep-alive

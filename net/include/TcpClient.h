@@ -43,6 +43,7 @@ public:
 
     int sendInLoop(std::string&);
     int getState()const{return (int)state_;}
+    void setState(CLIENT_STATUS state){state_ = state;}
     std::unique_ptr<HttpInfo>& getHttpInfo(){return httpInfo_;}
 //    std::unique_ptr<HttpInfo>& resetHttpInfo();
 

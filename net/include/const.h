@@ -29,10 +29,9 @@ enum class CLIENT_STATUS{
     NONE = 0,
     CONNECT,
     SEND_CONTINUE,
-    SEND_ERROR,
-    SEND_OK,
-    DISCONNECT,
-    WAIT_DISCONNECT
+    WAIT_DISCONNECT,
+    MUST_CLOSE_CONNECT,
+    DISCONNECT
 };
 // std::map<std::string,std::string> httpContentTypes = {
 //     {"js","application/x-javascript"},

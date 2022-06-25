@@ -3,18 +3,14 @@
 #include "HttpResponse.h"
 #include "const.h"
 #include "Logger.h"
-
 #include "Header.h"
 
-
 #include <gflags/gflags.h>
-
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unordered_set>
 
 using namespace std;
-
 
 DEFINE_string(index,"run.html", "web index html");
 DEFINE_string(path,"./www/dxgzg_src", "html path");
@@ -37,7 +33,7 @@ bool RequestFileInfo::getFileStat(){
         // 说明未找到请求的文件
         LOG_ERROR("file not exist:%s",filePath_.c_str());
         fileType_ = "html";// 校正一下html
-        // todo 可以加载个默认404页面
+
         filePath_ = FLAGS_path +"/404.html";
         fileFd_ = ::open(filePath_.c_str(),O_CLOEXEC | O_RDONLY); // 404.html必存在
         flag = false;
@@ -52,10 +48,10 @@ void ResponseHead::initHttpResponseHead(HTTP_STATUS_CODE code){
     switch (code)
     {
     case HTTP_STATUS_CODE::OK:
-        responseHeader_ = "HTTP/1.1 200 OK\r\n";//Origin:*\r\n
+        responseStatue_ = "HTTP/1.1 200 OK\r\n";//Origin:*\r\n
         break;
     case HTTP_STATUS_CODE::NOT_FOUND:
-        responseHeader_ = "HTTP/1.1 404 NOTFOUND\r\n";
+        responseStatue_ = "HTTP/1.1 404 NOTFOUND\r\n";
         break;
     default: 
         break;
@@ -320,6 +316,14 @@ bool HttpInfo::isParseFinish(){
         return false;
     }
     return true;
+}
+
+string HttpInfo::getBodyData(){
+    return parse_->getHeader()->bodyData_;
+}
+
+void HttpInfo::setResponse(HTTP_STATUS_CODE code ,const char* data){
+    response_->setResponseData(code,data);
 }
 
 RequestFileInfo::~RequestFileInfo() = default;

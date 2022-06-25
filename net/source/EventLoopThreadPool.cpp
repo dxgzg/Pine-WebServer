@@ -4,7 +4,9 @@
 #include "Logger.h"
 
 #include <sstream>
-
+#include <atomic>
+using namespace std;
+atomic<int> g_i;
 EventLoopThreadPool::EventLoopThreadPool() = default;
 
 void EventLoopThreadPool::setThreadNum(int num){
@@ -16,10 +18,9 @@ void EventLoopThreadPool::start(){
         std::thread t(&EventLoopThreadPool::createEventLoop,this);
         std::ostringstream oss;
         oss << t.get_id(); // 为了消除警告
-        LOG_INFO("create new %d thread threadId:%s",i + 1,oss.str().c_str());
+//        LOG_INFO("create new %d thread threadId:%s",i + 1,oss.str().c_str());
         threadPool_.emplace_back(std::move(t));
     }
-    LOG_INFO("thread size%lu",threadPool_.size());
 }
 EventLoop* EventLoopThreadPool::getNextLoop(){
     if(next_ >= eventLoopPtrPool_.size()){next_ = 0;}
@@ -36,6 +37,7 @@ EventLoopThreadPool::~EventLoopThreadPool(){
 }
 
 void EventLoopThreadPool::createEventLoop(){
+    LOG_INFO("create new  thread threadId:%s",oss.str().c_str());
     EventLoopThreadPtr ptr = std::make_unique<EventLoopThread>();// 这样也能造一个loop出来
     EventLoop* loop = ptr->getLoop();
     std::unique_lock<std::mutex> lock(mutex_);

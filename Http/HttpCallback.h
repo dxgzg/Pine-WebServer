@@ -6,19 +6,25 @@
 #define PINE_HTTPCALLBACK_H
 #include "nocopyable.h"
 #include "functional"
-#include "string"
+#include <string>
+
+class HttpInfo;
+#include <unordered_map>
 
 class HttpCallback : public  nocopyable{
-    using callback = std::function<bool(std::string,std::string)>;
+public:
+    using callback = std::function<void(HttpInfo*)>;
 public:
     // todo 待修改接口类型
-    static void setPostCB(callback cb){ postCallback_ = std::move(cb);}
-    static callback getPostCB(){
-        return postCallback_;
-    }
+    static void setPostCB(const char* s,callback cb);
+    static callback getPostCB(const char* s);
+
+    static void setGetCB(const char* s,callback cb);
+    static callback getGetCB(const char* s);
 private:
     HttpCallback() = default;
-    static callback postCallback_;
+    static std::unordered_map<std::string,callback> postCallBack_;
+    static std::unordered_map<std::string,callback> getCallBack_;
 };
 
 
