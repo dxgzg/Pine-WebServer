@@ -12,7 +12,7 @@
 
 using namespace std;
 
-DEFINE_string(index,"run.html", "web index html");
+DEFINE_string(index,"hello.html", "web index html");
 DEFINE_string(path,"./www/dxgzg_src", "html path");
 
 static unordered_set<string> filterSet{
@@ -255,7 +255,7 @@ bool HttpParse::setResponseFile(std::string& requestFile){
     // 设置请求
     if (requestFile == "/")
     { // 如果是/的话就给默认值
-        header_->reqFileInfo_->filePath_ = path_+ FLAGS_index;
+        header_->reqFileInfo_->filePath_ = path_+ requestFile +  FLAGS_index;
         requestFile = FLAGS_index;
     }else{
         header_->reqFileInfo_->filePath_ = path_;

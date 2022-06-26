@@ -15,4 +15,5 @@ cmake-build-debug/*
 1.txt
 erroPine
 cmake-build-pine/*
+www/*
 
