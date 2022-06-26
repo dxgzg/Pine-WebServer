@@ -1,5 +1,0 @@
-1.<pre><code class="language-shell">cd path/to/app
-gin run main.go
-</code></pre>这样是可以输出代码的。
-
-2.blog是真正的文章内容，category是这个类的汇总
