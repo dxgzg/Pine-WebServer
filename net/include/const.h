@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include <set>
+#include <functional>
 
 static std::set<std::string> METHOD{
         {"POST"},
@@ -43,4 +44,5 @@ enum class CLIENT_STATUS{
 //     {"html","text/"},
 //     {"json","application/"}
 // };
+using timerCallback = std::function<void()>;
 #endif

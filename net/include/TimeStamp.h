@@ -3,6 +3,7 @@
 #include <time.h>
 #include <string>
 #include <chrono>
+#include <sys/time.h>
 #include "Logger.h"
 
 class TimeStamp{ 
@@ -30,5 +31,13 @@ public:
         strftime(buff,128,"%a,%d %b %Y %X UTC",tm_time);
         return buff;
 	}
+    static std::uint64_t nowToSecond()
+    {
+        struct timeval tv;
+        gettimeofday(&tv, NULL);
+        std::uint64_t seconds = tv.tv_sec;
+        return seconds;
+    }
+
 private:
 };

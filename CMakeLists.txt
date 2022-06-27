@@ -22,7 +22,10 @@ aux_source_directory(Http Http)
 aux_source_directory(net/source NetSource)
 aux_source_directory(project Project)
 
+
 add_executable(Pine ${Main} ${Rapidjson} ${Http} ${NetSource} ${Project})
+add_executable(test_timer test/test_timer.cpp ${NetSource} ${Http})
+target_link_libraries(test_timer pthread gflags)
 #target_include_directories(Pine PUBLIC .)
 #add_executable(Pine ${SRC_LIST1} ${SRC_LIST2} ${SRC_LIST3} Http/Header.h Http/HttpCallback.cpp Http/HttpCallback.h Http/Header.cpp)
 # 加一个动态链接库

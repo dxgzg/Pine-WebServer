@@ -30,7 +30,7 @@ class HeartConnect : public nocopyable{
     using NodePtr = std::shared_ptr<Node>;
     
 public:
-    HeartConnect(EventLoop* loop,int expire = 2);
+    HeartConnect(EventLoop* loop,int expire = 200);
     ~HeartConnect() = default;
     void add(int fd,std::shared_ptr<TcpClient> cPtr,std::function<void()> callback);
     // 处理定时产生的消息
