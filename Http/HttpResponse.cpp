@@ -27,7 +27,8 @@ std::map<std::string, std::string> httpContentTypes = {
         {"zip",  "application/zip"},
         {"html", "text/html"},
         {"json", "application/json"},
-        {"jpeg", "image/jpeg"}
+        {"jpeg", "image/jpeg"},
+        {"woff2","font/woff2"}
 };
 
 

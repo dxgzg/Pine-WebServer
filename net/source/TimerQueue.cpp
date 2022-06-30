@@ -64,6 +64,8 @@ TimerQueue::TimerQueue(EventLoop* loop):loop_(loop),timefd_(createTimefd()),
 TimerQueue::~TimerQueue() = default;
 
 Timer* TimerQueue::addTimer(timerCallback timerCallback,int expire,bool repeat){
+    LOG_INFO("insert");
+    LOG_INFO("%ld,%d，%ld",TimeStamp::nowToSecond(),expire,expire + TimeStamp::nowToSecond());
     unique_ptr<Timer> timer = make_unique<Timer>(expire + TimeStamp::nowToSecond(),expire,timerCallback,repeat);
     auto result = timer.get();
     insert(timer);
@@ -91,19 +93,22 @@ void TimerQueue::handleRead(){
     LOG_INFO("time out");
 
     std::uint64_t now = TimeStamp::nowToSecond();
-    for(auto& it : timerQueue_){
-        if(it.first <= now){
-            it.second->run(); // callback
-            if(it.second->repeat()){
-                it.second->setWhen(it.second->expiration());
-                auto timer = make_unique<Timer>(*it.second);
+    for(auto it = timerQueue_.begin();it != timerQueue_.end();){
+        LOG_INFO("222");
+        if(it->first <= now){
+            it->second->run(); // callback
+            if(it->second->repeat()){
+                it->second->setWhen(it->second->expiration());
+                auto timer = make_unique<Timer>(*it->second);
                 insert(timer);
             }
-            timerQueue_.erase(it);
+            it = timerQueue_.erase(it);
         } else{
             break;
         }
+        LOG_INFO("1111");
     }
+
     // todo reset time
 
     auto it = timerQueue_.begin();
