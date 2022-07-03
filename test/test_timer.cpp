@@ -36,8 +36,16 @@ void example_repeat_timer(){
     loop.loop();
 }
 
+void example_loop_timer(){
+    EventLoop loop;
+    TimerQueue q(&loop);
+    for(int i = 0;i < 500000;++i){
+        q.addTimer(myTimer,2, false);
+    }
+    loop.loop();
+}
 int main() {
-    example_multi_add_timer();
+    example_loop_timer();
 //    example_repeat_timer();
 
     EventLoop loop;

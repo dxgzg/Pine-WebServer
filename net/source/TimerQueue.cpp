@@ -38,6 +38,10 @@ int createTimefd(){
 
 void resetTime(int timefd,std::uint64_t when){
     __time_t expire = when - TimeStamp::nowToSecond();
+    if(expire < 0){
+//        LOG_FATAL("expire timer error");
+        return ;
+    }
     struct itimerspec newValue;
     struct itimerspec oldValue;
     memZero(&newValue, sizeof newValue);

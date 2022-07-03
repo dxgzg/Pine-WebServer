@@ -42,13 +42,8 @@ TcpClient::~TcpClient(){
 // 线程安全注册回调函数
 void TcpClient::registerClient(){
     assert(isSameThread(loop_->getThreadId()));
-    HeartConnect* heartConnect = loop_->getHeartConnect();
-
-    std::function<void(int)> heartCallback = std::bind(&HeartConnect::clientCloseCallback,heartConnect,std::placeholders::_1);
-    setHeartConnectCloseCallback(heartCallback);
-
     std::function<void()> callback = std::bind(&TcpClient::CloseCallback,this);
-    heartConnect->add(getFd(),shared_from_this(),callback);
+
     this->state_ = CLIENT_STATUS::CONNECT;
     channel_->enableReadEvent();
 }
@@ -87,8 +82,7 @@ void TcpClient::ReadCallback(){
             CloseCallback();
             return ;
         }
-        auto headDet = loop_->getHeartConnect();
-        headDet->add(clientFd_->getFd(),shared_from_this(),std::bind(&TcpClient::CloseCallback,this));
+
         readCallback_(shared_from_this(),inputBuffer_.get());
         return ;
     }
@@ -123,9 +117,6 @@ int TcpClient::sendInLoop(std::string& msg){
         LOG_ERROR("send error");
         return -1;
     }
-
-    auto headDet = loop_->getHeartConnect();
-    headDet->add(clientFd_->getFd(),shared_from_this(),std::bind(&TcpClient::CloseCallback,this));
 
     if(msg.size() > n){
         string s = msg.substr(n);
@@ -165,8 +156,6 @@ void TcpClient::sendExtra(){
     outputBuffer_->retrieve(n);
 
     if(n == msg.size() && outputBuffer_->readAble() == 0){
-        auto headDet = loop_->getHeartConnect();
-        headDet->add(clientFd_->getFd(),shared_from_this(),std::bind(&TcpClient::CloseCallback,this));
         channel_->disableWriteEvent();
 
 //        auto end = system_clock::now();

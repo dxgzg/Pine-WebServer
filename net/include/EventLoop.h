@@ -6,9 +6,11 @@
 #include <mutex>
 
 #include "Epoller.h"
+#include "const.h"
 
 class Channel;
 class HeartConnect;
+class TimerQueue;
 
 class EventLoop{
     using Function = std::function<void()>;
@@ -26,7 +28,9 @@ public:
     void doPendingFunctor();
 
     std::thread::id getThreadId()const{return threadId_;}
-    HeartConnect* getHeartConnect(){return heartConnect_.get();}
+    void addTimer(timerCallback cb,int expire,bool repeat = false);
+
+//    HeartConnect* getHeartConnect(){return heartConnect_.get();}
 
     // void addHeadDetection(int fd,std::function<void()> callback);
     ~EventLoop();
@@ -39,5 +43,5 @@ private:
     std::unique_ptr<Channel> wakeChanel_;
     
     // 与muduo不同的成员
-    std::unique_ptr<HeartConnect> heartConnect_;
+    std::unique_ptr<TimerQueue> timerQueue_;
 };

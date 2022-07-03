@@ -7,7 +7,7 @@
 #include "Epoller.h"
 #include "Channel.h"
 #include "Logger.h"
-#include "HeartConnect.h"
+#include "TimerQueue.h"
 
 using namespace std;
 
@@ -28,7 +28,7 @@ EventLoop::EventLoop():epoller_(std::make_unique<Epoller>()),
                         wakefd_(createFd()),
                         threadId_(std::this_thread::get_id()),
                         wakeChanel_(std::make_unique<Channel>(this,wakefd_)),
-                        heartConnect_(std::make_unique<HeartConnect>(this))
+                       timerQueue_(std::make_unique<TimerQueue>(this))
 {
     wakeChanel_->setReadCallback(std::bind(&EventLoop::handleRead,this));
     wakeChanel_->enableReadEvent();
@@ -95,6 +95,10 @@ void EventLoop::doPendingFunctor(){
     }
 }
 
+void EventLoop::addTimer(timerCallback cb,int expire,bool repeat){
+
+    timerQueue_->addTimer(cb,expire,repeat);
+}
 
 // void EventLoop::addHeadDetection(int fd,std::function<void()> callback){
 //     if(::isSameThread(threadId_)){

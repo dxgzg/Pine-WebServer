@@ -5,13 +5,19 @@
 
 #include <string>
 #include <any>
+#include "Logger.h"
 
 
 class Timer{
 public:
     explicit Timer(std::uint64_t   when,std::uint64_t expire,
           timerCallback timerCallback,bool repeat = false);
-    void run(){timerCallback_();}
+    void run(){
+        if(!timerCallback_){
+            LOG_ERROR("timer callback not exist");
+        }
+        timerCallback_();
+    }
 //    std::uint64_t getTimerId(){return timerId_;}
     bool isTimerRepeat(){return repeat_;}
     std::uint64_t expiration(){return expire_;}
